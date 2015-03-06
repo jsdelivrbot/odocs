@@ -1,0 +1,78 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="assets/styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-app="docs">
+
+    <div ui-view></div>
+
+    <!-- build:js(.) scripts/oldieshim.js -->
+    <!--[if lt IE 9]>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/json3/lib/json3.js"></script>
+    <![endif]-->
+    <!-- endbuild -->
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/textAngular/dist/textAngular.min.js"></script>
+    <script src="bower_components/ng-file-upload/angular-file-upload.js"></script>
+    <script src="bower_components/sprintf/src/sprintf.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="app.module.js"></script>
+    <script src="app.route.js"></script>
+    <script src="app.run.js"></script>
+
+    <script src="constants/_constants.module.js"></script>
+    <script src="constants/api.constant.js"></script>
+    <script src="constants/events.constant.js"></script>
+
+    <script src="utils/_utils.module.js"></script>
+    <script src="utils/httpClient.service.js"></script>
+    <script src="utils/lodash.service.js"></script>
+
+    <script src="header/_header.module.js"></script>
+    <script src="header/header.controller.js"></script>
+    <script src="header/menuService.service.js"></script>
+    <script src="header/menuItem.directive.js"></script>
+
+    <script src="settings/_settings.module.js"></script>
+    <script src="settings/documentation.service.js"></script>
+    <script src="settings/manageDocumentations.controller.js"></script>
+    <script src="settings/addDocumentation.modal.controller.js"></script>
+    <script src="settings/addVersion.modal.controller.js"></script>
+
+    <script src="viewer/_viewer.module.js"></script>
+    <script src="viewer/viewer.controller.js"></script>
+    <script src="viewer/viewerElement.directive.js"></script>
+    <script src="viewer/viewer.service.js"></script>
+    <!-- endbuild -->
+</body>
+</html>

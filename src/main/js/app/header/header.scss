@@ -1,0 +1,20 @@
+.navbar {
+  margin-bottom: 5px;
+
+  .open, .active {
+    background-color: #e7e7e7;
+  }
+}
+
+.split-menu {
+  a {
+    display: inline-block !important;
+  }
+
+  .button { padding-right: 0; }
+  .expander { padding-left: 0; }
+
+  .dropdown-menu {
+    a { width: 100%; }
+  }
+}

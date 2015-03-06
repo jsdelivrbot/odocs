@@ -1,0 +1,25 @@
+<li class="split-menu" ng-class="{active: isActive(item)}" dropdown>
+  <a ui-sref="viewer({versionId: mainVersion().id, url: '/'})" class="button">
+    {{item.name}}
+  </a>
+
+  <a href="" class="expander dropdown-toggle" dropdown-toggle>
+    <span class="caret"></span>
+  </a>
+
+  <ul class="dropdown-menu">
+    <li ng-repeat="version in item.versions">
+      <a ui-sref="viewer({versionId: version.id, url: '/'})"
+         ng-class="{active: isSelected(version.id)}">
+        {{version.name}}
+      </a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="#">TODO favorites</a>
+    </li>
+    <li>
+      <a href="#">TODO history</a>
+    </li>
+  </ul>
+</li>
