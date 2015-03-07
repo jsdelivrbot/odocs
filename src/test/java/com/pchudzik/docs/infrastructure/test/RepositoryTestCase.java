@@ -1,7 +1,7 @@
 package com.pchudzik.docs.infrastructure.test;
 
 import com.pchudzik.docs.infrastructure.ApplicationPropertiesConfiguration;
-import com.pchudzik.docs.poc.proxy.DatabaseConfiguration;
+import com.pchudzik.docs.infrastructure.DatabaseConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.context.ContextConfiguration;

@@ -1,4 +1,7 @@
 # odocs
+
+[![Build Status](https://travis-ci.org/pchudzik/odocs.svg)](https://travis-ci.org/pchudzik/odocs)
+
 It will be in browser offline documentation viewer.
 There is a lot of similar stuff:
 * http://zealdocs.org/
@@ -28,3 +31,4 @@ If you want to take it for test run (It probably won't work on your machine but 
 ./gradlew jettyStart #start backend from project root directory
 npm install && bower install && grunt server # start frontend from src/main/js directory
 ```
+for more details about what is required to build this project see [.travis.yml](.travis.yml)

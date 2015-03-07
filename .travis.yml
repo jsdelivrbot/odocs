@@ -1,0 +1,20 @@
+language: java
+jdk:
+  - oraclejdk8
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install build-essential libssl-dev
+  - nvm install v0.12.0
+  - nvm use 0.12.0
+  - npm install -g bower
+  - npm install -g grunt-cli
+  - gem update --system
+  - gem install compass
+
+script:
+  - ./gradlew check
+  - cd src/main/js
+  - npm install
+  - bower install
+  - grunt

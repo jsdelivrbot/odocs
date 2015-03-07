@@ -19,6 +19,7 @@
 * add support for more then zip files
 
 # technical
+* !! fix ng-annotate
 * !!!! use protractor and start writing automated integration tests
 * !!! runnable application (in file db in user home, with database migration scripts, deployment directory, embedded jetty server).
 * !!! jetty upgrade (or downgrade) - according to guys from jetty version M3 should work better
