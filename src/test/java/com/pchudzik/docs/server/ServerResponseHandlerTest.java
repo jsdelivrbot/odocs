@@ -1,5 +1,6 @@
 package com.pchudzik.docs.server;
 
+import com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper;
 import com.pchudzik.docs.server.ServerResponseHandler.InputStreamProvider;
 import com.pchudzik.docs.server.ServerResponseHandler.ServerResource;
 import org.apache.http.HttpResponse;
@@ -14,8 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import static com.pchudzik.docs.server.HttpClientAssertionHelper.allowOriginHeaderWithValue;
-import static com.pchudzik.docs.server.HttpClientAssertionHelper.status;
+import static com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper.allowOriginHeaderWithValue;
+import static com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper.status;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

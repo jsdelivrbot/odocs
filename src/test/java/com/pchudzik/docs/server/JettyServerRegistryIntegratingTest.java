@@ -1,6 +1,7 @@
 package com.pchudzik.docs.server;
 
 import com.google.common.collect.ImmutableMap;
+import com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper;
 import com.pchudzik.docs.model.DocumentationVersion;
 import com.pchudzik.docs.model.UrlRewriteRule;
 import com.pchudzik.docs.model.VersionFile;
@@ -19,8 +20,8 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.Optional;
 
-import static com.pchudzik.docs.server.HttpClientAssertionHelper.allowOriginHeaderWithValue;
-import static com.pchudzik.docs.server.HttpClientAssertionHelper.status;
+import static com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper.allowOriginHeaderWithValue;
+import static com.pchudzik.docs.infrastructure.test.HttpClientAssertionHelper.status;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;

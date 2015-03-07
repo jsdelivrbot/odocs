@@ -1,6 +1,6 @@
 # odocs
 
-[![Build Status](https://travis-ci.org/pchudzik/odocs.svg)](https://travis-ci.org/pchudzik/odocs)
+[![Build Status](https://travis-ci.org/pchudzik/odocs.svg?branch=master)](https://travis-ci.org/pchudzik/odocs)
 
 It will be in browser offline documentation viewer.
 There is a lot of similar stuff:

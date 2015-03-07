@@ -1,6 +1,6 @@
-package com.pchudzik.docs.server;
+package com.pchudzik.docs.infrastructure.test;
 
-import com.pchudzik.docs.infrastructure.test.DescriptiveCondition;
+import com.pchudzik.docs.infrastructure.ApplicationConstants;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,7 +15,7 @@ import java.util.function.Function;
  * Created by pawel on 20.02.15.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-class HttpClientAssertionHelper {
+public class HttpClientAssertionHelper {
 
 	@SneakyThrows
 	public static String content(HttpResponse response) {
@@ -34,7 +34,7 @@ class HttpClientAssertionHelper {
 	}
 
 	public static Condition<? super HttpResponse> allowOriginHeaderWithValue(String allowOriginDomain) {
-		final Function<HttpResponse, String> getAccessControlAllowOrganHeader = response -> response.getFirstHeader(ServerResponseHandler.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER).getValue();
+		final Function<HttpResponse, String> getAccessControlAllowOrganHeader = response -> response.getFirstHeader(ApplicationConstants.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER).getValue();
 		return DescriptiveCondition.builderFor(HttpResponse.class)
 				.predicate(response -> Objects.equals(
 						getAccessControlAllowOrganHeader.apply(response),

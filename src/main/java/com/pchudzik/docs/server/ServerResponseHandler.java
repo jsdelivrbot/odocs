@@ -1,6 +1,7 @@
 package com.pchudzik.docs.server;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.pchudzik.docs.infrastructure.ApplicationConstants;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,6 @@ import static org.apache.commons.lang3.StringUtils.join;
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 class ServerResponseHandler extends AbstractHandler {
-	static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
-
 	final InputStreamProvider inputStreamProvider;
 	final String allowOriginDomain;
 
@@ -94,7 +93,7 @@ class ServerResponseHandler extends AbstractHandler {
 	}
 
 	private void addAccessControlHeader(HttpServletResponse response) {
-		response.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOriginDomain);
+		response.setHeader(ApplicationConstants.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowOriginDomain);
 	}
 
 	@RequiredArgsConstructor

@@ -19,7 +19,7 @@ import static java.util.Collections.swap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Documentation extends NameAware {
 	@OrderColumn
-	@JoinColumn(name = "documentation_id")		//TODO test if it actually works
+	@JoinColumn(name = "documentation")
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<DocumentationVersion> versions = new ArrayList<>();
 
