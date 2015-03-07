@@ -6,7 +6,6 @@
 * !!! jetty upgrade (or downgrade) - according to guys from jetty version M3 should work better
 * !!! create database restrictions and apply @Valid for input beans to avoid invalid objects creation
 * !! online documentation repository - store documentations configuration in remote location for easier local deployment
-* !! try to apply jooq or queryDSL
 * !! add support for other files then .zip
 * ! redeploy should use already assigned port (no port change after deploy)
 * redeploy should not unizp files if file wasn't modified

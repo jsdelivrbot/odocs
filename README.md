@@ -16,7 +16,7 @@ I've a lot of plans see [roadmap.md](other_file.md)
 
 ## technology stack
 Yay yet another java webapp with angular frontend ;)
-backend is java8 with in H2 database as storage.
+backend is java8 with in H2 database as storage (please be aware of queryDSL - run `./gradlew generateQueryDSL` to generate Q* classes into /src/main/generated).
 Frontend in angular 1.3.
 There is a lot of libraries see build.gradle and bower.json for details
 
