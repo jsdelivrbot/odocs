@@ -38,8 +38,18 @@ class ManagementController {
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST)
-	DocumentationDto updateDocumentation(@PathVariable String id, @RequestBody DocumentationDto documentation) {
-		return managementService.updateDocumentation(id, documentation);
+	void updateDocumentation(@PathVariable String id, @RequestBody DocumentationDto documentation) {
+		managementService.updateDocumentation(id, documentation);
+	}
+
+	@RequestMapping(value = "/{id}/move-up", method = RequestMethod.PUT)
+	void moveDocumentationUp(@PathVariable String id) {
+		managementService.moveDocumentationUp(id);
+	}
+
+	@RequestMapping(value = "/{id}/move-down", method = RequestMethod.PUT)
+	void moveDocumentationDown(@PathVariable String id) {
+		managementService.moveDocumentationDown(id);
 	}
 
 	@RequestMapping(value = "/{id}/versions", method = RequestMethod.POST)

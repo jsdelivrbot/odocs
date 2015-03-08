@@ -12,7 +12,7 @@ Currently there is not much to talk about. It's possible to start application on
 You can upload documentation (in theory any documentation - no external processing is required).
 For example you can download angular documentations (provided with angular library itself), upload it and use it.
 
-I've a lot of plans see [roadmap.md](other_file.md)
+For planed features see [roadmap.md](other_file.md)
 
 ## technology stack
 Yay yet another java webapp with angular frontend ;)

@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.swap;
 
 /**
  * Created by pawel on 08.02.15.
@@ -18,10 +17,19 @@ import static java.util.Collections.swap;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Documentation extends NameAware {
+	Integer orderIndex = 0;
+
 	@OrderColumn
 	@JoinColumn(name = "documentation")
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	List<DocumentationVersion> versions = new ArrayList<>();
+
+	@Transient
+	private MovableHelper<DocumentationVersion> versionMoveHelper = new MovableHelper<>(versions);
+
+	@PostLoad private void initialize() {
+		versionMoveHelper = new MovableHelper<>(versions);
+	}
 
 	public List<DocumentationVersion> getVersions() {
 		return Collections.unmodifiableList(versions);
@@ -37,15 +45,11 @@ public class Documentation extends NameAware {
 	}
 
 	public void moveVersionUp(DocumentationVersion version) {
-		final int currentVersionIndex = versions.indexOf(version);
-		Preconditions.checkArgument(currentVersionIndex > 0, "Can not move up first version");
-		swap(versions, currentVersionIndex, currentVersionIndex - 1);
+		versionMoveHelper.moveUp(version);
 	}
 
 	public void moveVersionDown(DocumentationVersion version) {
-		final int currentVersionIndex = versions.indexOf(version);
-		Preconditions.checkArgument(currentVersionIndex < versions.size() - 1, "Can not move down last version");
-		swap(versions, currentVersionIndex, currentVersionIndex + 1);
+		versionMoveHelper.moveDown(version);
 	}
 
 	public void removeVersion(DocumentationVersion version) {

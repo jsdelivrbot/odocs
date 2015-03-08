@@ -110,15 +110,6 @@ public class ManagementControllerBindingTest {
 	public void should_update_documentation() {
 		final String id = "documentation to update";
 
-		when(managementService.updateDocumentation(id, DocumentationDto.builder()
-						.name("new name")
-						.build()))
-				.thenReturn(DocumentationDto.builder()
-						.id(id)
-						.name("new name")
-						.versions(Collections.emptyList())
-						.build());
-
 		//when
 		controllerTester.perform(httpPost(
 						"/manage/documentations/{id}",
@@ -126,12 +117,11 @@ public class ManagementControllerBindingTest {
 						fixJson("{name: 'new name'}")))
 
 				//then
-				.andExpect(status().isOk())
-				.andExpect(jsonContent().isEqual(fixJson("{" +
-						"  id: '" + id + "', " +
-						"  name: 'new name'," +
-						"  versions: []" +
-						"}")));
+				.andExpect(status().isOk());
+
+		verify(managementService).updateDocumentation(id, DocumentationDto.builder()
+				.name("new name")
+				.build());
 	}
 
 	@Test

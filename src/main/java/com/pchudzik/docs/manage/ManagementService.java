@@ -5,6 +5,7 @@ import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.Documentation;
 import com.pchudzik.docs.model.DocumentationVersion;
 import com.pchudzik.docs.model.UrlRewriteRule;
+import com.pchudzik.docs.model.Workspace;
 import com.pchudzik.docs.repository.DocumentationRepository;
 import com.pchudzik.docs.repository.UrlRewriteRuleRepository;
 import com.pchudzik.docs.repository.VersionRepository;
@@ -28,6 +29,7 @@ class ManagementService {
 	final DocumentationRepository documentationRepository;
 	final VersionRepository versionRepository;
 	final UrlRewriteRuleRepository urlRewriteRuleRepository;
+	final WorkspaceService workspaceService;
 	final JettyServerRegistry serverRegistry;
 
 	@Autowired
@@ -35,18 +37,20 @@ class ManagementService {
 			DocumentationRepository documentationRepository,
 			VersionRepository versionRepository,
 			UrlRewriteRuleRepository urlRewriteRuleRepository,
-			JettyServerRegistry serverRegistry) {
+			WorkspaceService workspaceService, JettyServerRegistry serverRegistry) {
 		this.documentationRepository = documentationRepository;
 		this.versionRepository = versionRepository;
 		this.urlRewriteRuleRepository = urlRewriteRuleRepository;
+		this.workspaceService = workspaceService;
 		this.serverRegistry = serverRegistry;
 	}
 
 	@Transactional
 	public DocumentationDto createNewDocumentation(DocumentationDto documentationDto) {
-		final Documentation documentation = documentationRepository.persist(Documentation.builder()
+		final Documentation documentation = Documentation.builder()
 				.name(documentationDto.getName())
-				.build());
+				.build();
+		workspaceService.getDefaultWorkspace().addDocumentation(documentation);
 		return new DocumentationDto(documentation);
 	}
 
@@ -103,10 +107,23 @@ class ManagementService {
 	}
 
 	@Transactional
-	public DocumentationDto updateDocumentation(String id, DocumentationDto documentationDto) {
+	public void moveDocumentationUp(String documentationId) {
+		final Workspace defaultWorkspace = workspaceService.getDefaultWorkspace();
+		final Documentation documentation = documentationRepository.findOne(documentationId);
+		defaultWorkspace.moveDocumentationUp(documentation);
+	}
+
+	@Transactional
+	public void moveDocumentationDown(String documentationId) {
+		final Workspace defaultWorkspace = workspaceService.getDefaultWorkspace();
+		final Documentation documentation = documentationRepository.findOne(documentationId);
+		defaultWorkspace.moveDocumentationDown(documentation);
+	}
+
+	@Transactional
+	public void updateDocumentation(String id, DocumentationDto documentationDto) {
 		final Documentation documentation = documentationRepository.findOne(id);
 		documentation.updateName(documentationDto.getName());
-		return new DocumentationDto(documentation);
 	}
 
 	@Transactional

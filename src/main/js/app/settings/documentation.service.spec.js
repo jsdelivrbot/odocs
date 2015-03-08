@@ -2,6 +2,8 @@
 
 describe('documentation.service.spec.js', function() {
   var withoutId;
+  var directionUp = 'up';
+  var directionDown = 'down';
   var versionId = 'versionId';
   var docId = 'docId';
 
@@ -38,7 +40,7 @@ describe('documentation.service.spec.js', function() {
     });
 
     it('should move version up', function() {
-      setupMoveVersionUpExpectation(200);
+      setupMoveVersionExpectation(directionUp, 200);
 
       documentationService.version.moveUp(docId, versionId);
 
@@ -46,7 +48,7 @@ describe('documentation.service.spec.js', function() {
     });
 
     it('should move version down', function() {
-      setupMoveVersionDownExpectation(200);
+      setupMoveVersionExpectation(directionDown, 200);
 
       documentationService.version.moveDown(docId, versionId);
 
@@ -133,6 +135,22 @@ describe('documentation.service.spec.js', function() {
 
       $httpBackend.flush();
     });
+
+    it('should move documentation up', function() {
+      setupMoveDocumentationExpectation(directionUp, 200);
+
+      documentationService.documentation.moveUp(docId);
+
+      $httpBackend.flush();
+    });
+
+    it('should move documentation down', function() {
+      setupMoveDocumentationExpectation(directionDown, 200);
+
+      documentationService.documentation.moveDown(docId);
+
+      $httpBackend.flush();
+    });
   });
 
   describe('version url rewrite rules spec', function() {
@@ -167,16 +185,18 @@ describe('documentation.service.spec.js', function() {
 
     function allActionOperations(responseCode) {
       return [
-        [_.partial(setupNewVersionSaveExpectation, responseCode),        newVersionSave ],
-        [_.partial(setupVersionUpdateExpectation, responseCode),         versionUpdate ],
-        [_.partial(setupVersionFileUploadExpectation, responseCode),     versionFileUpload ],
-        [_.partial(setupVersionRemovalExpectation, responseCode),        versionRemove ],
-        [_.partial(setupMoveVersionUpExpectation, responseCode),         versionMoveUp ],
-        [_.partial(setupMoveVersionDownExpectation, responseCode),       versionMoveDown ],
-        [_.partial(setupUrlRewriteRulesUpdateExpectation, responseCode), urlRewriteRulesUpdate ],
-        [_.partial(setupDocumentationSaveExpectation, responseCode),     documentationSave ],
-        [_.partial(setupDocumentationUpdateExpectation, responseCode),   documentationUpdate ],
-        [_.partial(setupDocumentationRemoveExpectation, responseCode),   documentationRemove ]
+        [_.partial(setupNewVersionSaveExpectation, responseCode),                   newVersionSave ],
+        [_.partial(setupVersionUpdateExpectation, responseCode),                    versionUpdate ],
+        [_.partial(setupVersionFileUploadExpectation, responseCode),                versionFileUpload ],
+        [_.partial(setupVersionRemovalExpectation, responseCode),                   versionRemove ],
+        [_.partial(setupMoveVersionExpectation, directionUp, responseCode),         versionMoveUp ],
+        [_.partial(setupMoveVersionExpectation, directionDown, responseCode),       versionMoveDown ],
+        [_.partial(setupUrlRewriteRulesUpdateExpectation, responseCode),            urlRewriteRulesUpdate ],
+        [_.partial(setupDocumentationSaveExpectation, responseCode),                documentationSave ],
+        [_.partial(setupDocumentationUpdateExpectation, responseCode),              documentationUpdate ],
+        [_.partial(setupDocumentationRemoveExpectation, responseCode),              documentationRemove ],
+        [_.partial(setupMoveDocumentationExpectation, directionUp, responseCode),   documentationMoveUp],
+        [_.partial(setupMoveDocumentationExpectation, directionDown, responseCode), documentationMoveDown],
       ];
     }
 
@@ -205,6 +225,8 @@ describe('documentation.service.spec.js', function() {
         expect($rootScope.$emit).toHaveBeenCalledWith(DOCS.onDocumentationUpdate);
       });
 
+    function documentationMoveUp() {documentationService.documentation.moveUp(docId); }
+    function documentationMoveDown() {documentationService.documentation.moveDown(docId); }
     function versionMoveUp() { documentationService.version.moveUp(docId, versionId); }
     function versionMoveDown() { documentationService.version.moveDown(docId, versionId); }
     function urlRewriteRulesUpdate() { documentationService.version.updateRewriteRules(docId, versionId, []); }
@@ -217,15 +239,15 @@ describe('documentation.service.spec.js', function() {
     function newVersionSave() { documentationService.version.save(docId, { name: 'new version' }); }
   });
 
-  function setupMoveVersionUpExpectation(responseCode) {
+  function setupMoveDocumentationExpectation(direction, responseCode) {
     $httpBackend
-      .expectPUT(apiUrl('/manage/documentations/' + docId + '/versions/' + versionId + '/move-up'))
+      .expectPUT(apiUrl('/manage/documentations/' + docId + '/move-' + direction))
       .respond(responseCode);
   }
 
-  function setupMoveVersionDownExpectation(responseCode) {
+  function setupMoveVersionExpectation(direction, responseCode) {
     $httpBackend
-      .expectPUT(apiUrl('/manage/documentations/' + docId + '/versions/' + versionId + '/move-down'))
+      .expectPUT(apiUrl('/manage/documentations/' + docId + '/versions/' + versionId + '/move-' + direction))
       .respond(responseCode);
   }
 

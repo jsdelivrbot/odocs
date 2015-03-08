@@ -3,13 +3,13 @@ package com.pchudzik.docs.manage;
 import com.pchudzik.docs.manage.dto.DocumentationDto;
 import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.UrlRewriteRule;
+import com.pchudzik.docs.repository.DocumentationRepository;
 import lombok.SneakyThrows;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -25,9 +25,9 @@ import static java.util.Arrays.asList;
 @Component
 class TestDataProvider {
 	@Autowired ManagementService managementService;
+	@Autowired DocumentationRepository documentationRepository;
 
 	@PostConstruct
-	@Transactional
 	void insertTestData() {
 		saveAngular();
 	}

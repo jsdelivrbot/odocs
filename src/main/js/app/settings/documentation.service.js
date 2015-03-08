@@ -18,7 +18,9 @@ angular
       documentation: {
         list: _.partial(httpClient.get, '/manage/documentations'),
         save: saveDocumentation,
-        remove: removeDocumentation
+        remove: removeDocumentation,
+        moveUp: _.partial(moveDocumentation,  'up'),
+        moveDown: _.partial(moveDocumentation,  'down')
       }
     };
 
@@ -26,6 +28,12 @@ angular
       return id
         ? url + '/' + id
         : url;
+    }
+
+    function moveDocumentation(direction, documentationId) {
+      return httpClient
+        .put(_.fmt('/manage/documentations/%s/move-%s', documentationId, direction))
+        .then(emitDocumentationChangeEvent);
     }
 
     function moveVersion(direction, documentationId, versionId) {

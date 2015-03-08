@@ -11,6 +11,7 @@ describe('manageDocumentations.controller.spec.js', function() {
   var documentationListDeferred;
   var versionRemoveDeferred;
   var versionMoveDeferred;
+  var documentationMoveDeferred;
   var documentationRemoveDeferred;
 
   beforeEach(module('docs.settings'));
@@ -27,6 +28,10 @@ describe('manageDocumentations.controller.spec.js', function() {
       versionMoveDeferred = $q.defer();
       return versionMoveDeferred.promise;
     });
+    var moveDocumentation = jasmine.createSpy('move documentation function').and.callFake(function() {
+      documentationMoveDeferred = $q.defer();
+      return documentationMoveDeferred.promise;
+    });
     documentationServiceMock = {
       documentation: {
         list: function() {
@@ -36,7 +41,9 @@ describe('manageDocumentations.controller.spec.js', function() {
         remove: function() {
           documentationRemoveDeferred = $q.defer();
           return documentationListDeferred.promise;
-        }
+        },
+        moveUp: moveDocumentation,
+        moveDown: moveDocumentation
       },
       version: {
         remove: function() {
@@ -164,6 +171,46 @@ describe('manageDocumentations.controller.spec.js', function() {
         expect(doc.isOpen).toBeTruthy();
         expect(versionToMove.isOpen).toBeTruthy();
         expect(documentationServiceMock.version[serviceFnName]).toHaveBeenCalledWith(doc.id, versionToMove.id);
+        expect(documentationServiceMock.documentation.list).toHaveBeenCalled();
+      });
+  });
+
+  describe('documentation move spec', function() {
+    var firstDoc;
+    var secondDoc;
+
+    beforeEach(function() {
+      firstDoc = documentation('1');
+      secondDoc = documentation('2');
+
+      createController([firstDoc, secondDoc]);
+    });
+
+    it('should disable move up and down button if version is first and last', function() {
+      expect(scope.canMoveDocumentationUp(firstDoc)).toBeFalsy();
+      expect(scope.canMoveDocumentationUp(secondDoc)).toBeTruthy();
+
+      expect(scope.canMoveDocumentationDown(secondDoc)).toBeFalsy();
+      expect(scope.canMoveDocumentationDown(firstDoc)).toBeTruthy();
+    });
+
+    runParametrizedTest(
+      'should documentation up/down and open moved documentation',
+      [
+        ['moveDocumentationUp', 'moveUp', function() { return secondDoc; } ],
+        ['moveDocumentationDown', 'moveDown', function() { return firstDoc; } ]
+      ],
+      function(moveFnName, serviceFnName, documentationProvider) {
+        var documentationToMove = documentationProvider();
+        spyOn(documentationServiceMock.documentation, 'list').and.callThrough();
+
+        //when
+        scope[moveFnName](documentationToMove);
+        promiseResolver.resolve(documentationMoveDeferred);
+        promiseResolver.resolve(documentationListDeferred, [firstDoc, secondDoc]);
+
+        expect(documentationToMove.isOpen).toBeTruthy();
+        expect(documentationServiceMock.documentation[serviceFnName]).toHaveBeenCalledWith(documentationToMove.id);
         expect(documentationServiceMock.documentation.list).toHaveBeenCalled();
       });
   });

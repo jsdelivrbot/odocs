@@ -10,10 +10,16 @@ angular
     $scope.editVersion = editVersion;
     $scope.removeVersion = removeVersion;
     $scope.removeDocumentation = removeDocumentation;
+
     $scope.canMoveVersionUp = _.partial(canMoveVersion, _.first);
     $scope.canMoveVersionDown = _.partial(canMoveVersion, _.last);
     $scope.moveVersionUp = _.partial(moveVersion, documentationService.version.moveUp);
     $scope.moveVersionDown = _.partial(moveVersion, documentationService.version.moveDown);
+
+    $scope.canMoveDocumentationUp = _.partial(canMoveDocumentation, _.first);
+    $scope.canMoveDocumentationDown = _.partial(canMoveDocumentation, _.last);
+    $scope.moveDocumentationDown = _.partial(moveDocumentation, documentationService.documentation.moveDown);
+    $scope.moveDocumentationUp = _.partial(moveDocumentation, documentationService.documentation.moveUp);
 
     initialize();
 
@@ -68,12 +74,21 @@ angular
       }).result.then(_.partial(loadDocumentationsList, doc));
     }
 
+    function moveDocumentation(moveFn, doc) {
+      moveFn(doc.id)
+        .then(_.partial(loadDocumentationsList, doc));
+    }
+
+    function canMoveDocumentation(checkFn, doc) {
+      return checkFn($scope.documentations).id !== doc.id;
+    }
+
     function moveVersion(moveFn, doc, version) {
       moveFn(doc.id, version.id)
         .then(_.partial(loadDocumentationsList, doc, version));
     }
 
     function canMoveVersion(checkFn, doc, version) {
-      return checkFn(doc.versions) !== version;
+      return checkFn(doc.versions).id !== version.id;
     }
   });
