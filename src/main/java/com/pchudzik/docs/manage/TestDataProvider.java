@@ -4,18 +4,12 @@ import com.pchudzik.docs.manage.dto.DocumentationDto;
 import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.UrlRewriteRule;
 import com.pchudzik.docs.repository.DocumentationRepository;
-import lombok.SneakyThrows;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.io.IOUtils;
+import com.pchudzik.docs.utils.http.MultipartFileFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.FileInputStream;
 
 import static java.util.Arrays.asList;
 
@@ -49,7 +43,7 @@ class TestDataProvider {
 		managementService.setVersionFile(
 				angular.getId(),
 				v1_3_13.getId(),
-				createFile(new File("/home/pawel/Desktop", fileName)));
+				MultipartFileFactory.fromFile(new File("/home/pawel/Desktop", fileName)));
 
 		managementService.updateRewriteRules(
 				angular.getId(), v1_3_13.getId(),
@@ -57,13 +51,5 @@ class TestDataProvider {
 						.regexp("/docs/api.*")
 						.replacement("/docs/")
 						.build()));
-	}
-
-	@SneakyThrows
-	private MultipartFile createFile(File file) {
-		DiskFileItemFactory factory = new DiskFileItemFactory(10024, new File("build"));
-		final FileItem item = factory.createItem("file", "application/zip", true, file.getName());
-		IOUtils.copy(new FileInputStream(file), item.getOutputStream());
-		return new CommonsMultipartFile(item);
 	}
 }

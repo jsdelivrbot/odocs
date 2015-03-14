@@ -1,6 +1,7 @@
 package com.pchudzik.docs.server;
 
 import com.google.common.collect.Maps;
+import com.pchudzik.docs.infrastructure.annotation.DeploymentsDirectory;
 import com.pchudzik.docs.model.DocumentationVersion;
 import com.pchudzik.docs.model.UrlRewriteRule;
 import lombok.SneakyThrows;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,21 +26,20 @@ import java.util.*;
 @Slf4j
 @Service
 public class JettyServerRegistry {
-	@Value("${docs.allow.origin.domain:localhost}") String allowOriginDomain;
-	@Value("${docs.deploymnets:build/deployment}") String deploymentRootPath;
-
-	final FreePortSelector portSelector;
-
+	private final String allowOriginDomain;
+	private final FreePortSelector portSelector;
 	private File deploymentRoot;
+
 	private final Map<String, Pair<Deployable, DeploymentInfoDto>> serverInstances = Maps.newHashMap();
 
 	@Autowired
-	JettyServerRegistry(FreePortSelector portSelector) {
+	JettyServerRegistry(
+			FreePortSelector portSelector,
+			@Value("${docs.allowOriginDomain}") String allowOriginDomain,
+			@DeploymentsDirectory File deploymentRoot) {
 		this.portSelector = portSelector;
-	}
-
-	@PostConstruct void initialize() {
-		deploymentRoot = new File(deploymentRootPath);
+		this.deploymentRoot = deploymentRoot;
+		this.allowOriginDomain = allowOriginDomain;
 	}
 
 	@PreDestroy void tearDown() {

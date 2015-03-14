@@ -46,10 +46,10 @@ public class JettyServerRegistryIntegratingTest {
 		port = new FreePortSelector().getAvailablePort();
 		when(portSelectorMock.getAvailablePort()).thenReturn(port);
 
-		jettyServerRegistry = new JettyServerRegistry(portSelectorMock);
-		jettyServerRegistry.allowOriginDomain = ALLOW_ORIGIN_DOMAIN;
-		jettyServerRegistry.deploymentRootPath = "build/deployments";
-		jettyServerRegistry.initialize();
+		File deploymentRootPath = new File("build/deployments");
+		deploymentRootPath.mkdirs();
+
+		jettyServerRegistry = new JettyServerRegistry(portSelectorMock, ALLOW_ORIGIN_DOMAIN, deploymentRootPath);
 
 		httpClient = HttpClientBuilder.create().build();
 	}
