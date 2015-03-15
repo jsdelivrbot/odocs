@@ -38,6 +38,7 @@ public class DocumentationRepository extends EntityRepository<Documentation, Str
 						documentationVersion.versionFile.isNotNull(),
 						documentation.versions.size().gt(0)
 				)
+				.distinct()
 				.orderBy(documentation.orderIndex.asc())
 				.list(documentation);
 	}

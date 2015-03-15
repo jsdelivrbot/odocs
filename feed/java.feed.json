@@ -1,0 +1,13 @@
+{
+  "updateDate": "2015-03-15T11:34:32.000Z",
+  "name": "Java API",
+  "url": "http://download.oracle.com/otn-pub/java/jdk/8u40-b25/jdk-8u40-docs-all.zip",
+  "httpConfiguration": {
+	"headers": [
+	  {
+		"name": "Cookie",
+		"value": "oraclelicense=accept-securebackup-cookie"
+	  }
+	]
+  }
+}

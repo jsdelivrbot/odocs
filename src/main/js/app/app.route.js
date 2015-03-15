@@ -31,10 +31,19 @@ angular
         abstract: true,
         template: '<div ui-view></div>'
       })
-      .state('root.settings.manageDocumentations', {
-        url: '/manage-documentations',
+      .state('root.settings.manageDocumentationsTemplate', {
         controller: 'ManageDocumentations',
         templateUrl: 'settings/manageDocumentations.controller.html'
+      })
+      .state('manageDocumentations', {
+        parent: 'root.settings.manageDocumentationsTemplate',
+        url: '/manage-documentations',
+        views: {
+          pendingDownloads: {
+            controller: 'PendingDownloads',
+            templateUrl: 'settings/feed/pendingDownloads.controller.html'
+          }
+        }
       });
 
     $urlRouterProvider.otherwise('/');

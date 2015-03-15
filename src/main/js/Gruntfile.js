@@ -69,7 +69,8 @@ module.exports = function (grunt) {
         {
           context: '/api',
           host: 'localhost',
-          port: 8080
+          port: 8080,
+          ws: true
         }
       ],
       livereload: {
@@ -346,8 +347,7 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             '.htaccess',
-            '*.html',
-            '{,*/}*.html',
+            '{,**/}*.html',
             'assets/images/{,*/}*.{webp}',
             'fonts/{,*/}*.*'
           ]

@@ -42,6 +42,9 @@
     <script src="bower_components/textAngular/dist/textAngular.min.js"></script>
     <script src="bower_components/ng-file-upload/angular-file-upload.js"></script>
     <script src="bower_components/sprintf/src/sprintf.js"></script>
+    <script src="bower_components/stomp-websocket/lib/stomp.min.js"></script>
+    <script src="bower_components/sockjs-client/dist/sockjs.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -57,6 +60,11 @@
     <script src="utils/_utils.module.js"></script>
     <script src="utils/httpClient.service.js"></script>
     <script src="utils/lodash.service.js"></script>
+    <script src="utils/websocketComponents.service.js"></script>
+    <script src="utils/stomp.service.js"></script>
+    <script src="utils/spinner.directive.js"></script>
+    <script src="utils/momentjs.service.js"></script>
+    <script src="utils/timeDuration.directive.js"></script>
 
     <script src="header/_header.module.js"></script>
     <script src="header/header.controller.js"></script>
@@ -65,9 +73,17 @@
 
     <script src="settings/_settings.module.js"></script>
     <script src="settings/documentation.service.js"></script>
+    <script src="settings/feed.service.js"></script>
     <script src="settings/manageDocumentations.controller.js"></script>
-    <script src="settings/addDocumentation.modal.controller.js"></script>
-    <script src="settings/addVersion.modal.controller.js"></script>
+    <script src="settings/documentationChange.service.js"></script>
+    <script src="settings/custom/addDocumentation.modal.controller.js"></script>
+    <script src="settings/custom/addVersion.modal.controller.js"></script>
+    <script src="settings/downloads.service.js"></script>
+    <script src="settings/feed/selectFeed.modal.controller.js"></script>
+    <script src="settings/feed/selectDocumentation.modal.controller.js"></script>
+    <script src="settings/feed/pendingDownloads.controller.js"></script>
+    <script src="settings/feed/pendingItemCancelButton.directive.js"></script>
+    <script src="settings/feed/toMb.filter.js"></script>
 
     <script src="viewer/_viewer.module.js"></script>
     <script src="viewer/viewer.controller.js"></script>

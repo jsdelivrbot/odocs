@@ -4,6 +4,7 @@ describe('manageDocumentations.controller.spec.js', function() {
   var scope;
   var $controller;
   var documentationServiceMock;
+  var feedServiceMock;
   var modalMock;
 
   var deferredHelper;
@@ -19,6 +20,9 @@ describe('manageDocumentations.controller.spec.js', function() {
   beforeEach(function() {
     var moveVersion = deferredHelper.createFn();
     var moveDocumentation = deferredHelper.createFn();
+    feedServiceMock = {
+      listDownloadingItems: deferredHelper.createFn()
+    };
     documentationServiceMock = {
       documentation: {
         list: deferredHelper.createFn(),
@@ -195,7 +199,8 @@ describe('manageDocumentations.controller.spec.js', function() {
     $controller('ManageDocumentations', {
       $scope: scope,
       $modal: modalMock.instance,
-      documentationService: documentationServiceMock
+      documentationService: documentationServiceMock,
+      feedService: feedServiceMock
     });
 
     if(maybeDocumentationList) {

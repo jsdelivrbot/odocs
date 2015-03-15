@@ -11,7 +11,7 @@ angular
 
     $scope.openSettings = function() {
       menuService.deactivateAll();
-      $state.go('root.settings.manageDocumentations');
+      $state.go('manageDocumentations');
     };
 
     initialize();

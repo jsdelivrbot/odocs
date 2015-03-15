@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <button ng-click="close()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <h3>Install version defined by other users</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-md-3">
+      <ul class="nav nav-pills nav-stacked" role="tablist">
+        <li ng-repeat="category in categories" ng-class="{'active': isActive(category)}">
+          <a class="btn-lg" ng-click="selectCategory(category)" href="">{{category.name}}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-9">
+      <div class="tab-content">
+        <div class="tab-pane active">
+          <accordion close-other="oneAtATime">
+            <accordion-group ng-repeat="feed in selectedCategory.feeds">
+              <accordion-heading>
+                {{feed.name}}
+              </accordion-heading>
+              <div>
+                <div ng-bind-html="feed.additionalInfoHtml"></div>
+                <button class="btn btn-primary" ng-click="select(feed)">Download</button>
+              </div>
+            </accordion-group>
+          </accordion>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

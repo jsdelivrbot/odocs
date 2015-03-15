@@ -2,11 +2,12 @@
 
 angular
   .module('docs.settings')
-  .controller('ManageDocumentations', function($scope, $modal, _, documentationService) {
+  .controller('ManageDocumentations', function($scope, $modal, _, documentationService, feedService) {
     $scope.documentations = [];
     $scope.addNewDocumentation = _.partial(editDocumentation, null);
     $scope.editDocumentation = editDocumentation;
     $scope.addNewVersion = _.partial(editVersion, _, null);
+    $scope.addPredefinedVersion = addPredefinedVersion;
     $scope.editVersion = editVersion;
     $scope.removeVersion = removeVersion;
     $scope.removeDocumentation = removeDocumentation;
@@ -56,16 +57,37 @@ angular
 
     function editDocumentation(doc) {
       $modal.open({
-        templateUrl: 'settings/addDocumentation.modal.controller.html',
+        templateUrl: 'settings/custom/addDocumentation.modal.controller.html',
         controller: 'AddDocumentationModal',
         resolve: {
           doc: _.constant(doc)
         }}).result.then(loadDocumentationsList);
     }
 
+    function addPredefinedVersion() {
+      var feed = null;
+
+      $modal
+        .open({
+          templateUrl: 'settings/feed/selectFeed.modal.controller.html',
+          controller: 'SelectFeedModal'
+        })
+        .result
+        .then(function(selectedFeed) {
+          feed = selectedFeed;
+          return $modal.open({
+            templateUrl: 'settings/feed/selectDocumentation.modal.controller.html',
+            controller: 'SelectDocumentationModal'
+          }).result;
+        })
+        .then(function(selectedDocumentation) {
+          feedService.saveVersion(selectedDocumentation.id, feed);
+        });
+    }
+
     function editVersion(doc, version) {
       $modal.open({
-        templateUrl: 'settings/addVersion.modal.controller.html',
+        templateUrl: 'settings/custom/addVersion.modal.controller.html',
         controller: 'AddVersionModal',
         resolve: {
           doc: _.constant(doc),

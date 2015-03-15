@@ -1,0 +1,46 @@
+<div class="well" ng-show="downloadingItems.length">
+  <h4>Download queue</h4>
+  <div class="container-fluid">
+    <div ng-repeat="item in downloadingItems" class="row alert"
+         ng-class="{'alert-info': item.isPending(),
+                    'alert-success': item.hasSuccess(),
+                    'alert-danger': item.hasError(),
+                    'alert-warning': item.isAborted()}">
+      <div class="col-md-2">{{item.feedName}}</div>
+
+      <div class="col-md-8">
+        <div ng-show="item.isWaiting()">
+          <spinner active="true"></spinner> Waiting for download
+        </div>
+        <progressbar class="progress-striped active"
+                     ng-show="item.isInProgress()"
+                     value="item.progress">
+          {{item.progress | number:1}}% - {{item.downloadedBytes | toMb:2 }} MB out of {{item.totalBytes | toMb:2}} MB
+        </progressbar>
+        <div ng-show="item.hasSuccess()">
+          {{item.totalBytes | toMb:2}}MB downloaded in <time-duration from="item.submitDate" to="item.finishDate"></time-duration>
+          <a ui-sref="viewer({versionId: item.versionId, url: '/'})">
+            <i class="glyphicon glyphicon-link"></i> Open
+          </a>
+        </div>
+        <div ng-show="item.hasError()" class="stack-trace">
+          {{item.errorClass}} - {{item.errorMessage}}
+          <button class="btn btn-default btn-xs" ng-click="item.errorEvent.isCollapsed = !item.errorEvent.isCollapsed">
+            <i class="glyphicon glyphicon-arrow-down"></i> details
+          </button>
+          <div class="stack-trace" collapse="!item.errorEvent.isCollapsed">
+            <code>{{item.stackTrace}}</code>
+          </div>
+        </div>
+        <div ng-show="item.isAborted()">
+          {{item.abortDate}}
+        </div>
+      </div>
+
+      <div class="col-md-1">
+        <pending-item-cancel-button item="item" on-remove="removeItem(item)" type="cancel"></pending-item-cancel-button>
+        <pending-item-cancel-button item="item" on-remove="removeItem(item)" type="remove"></pending-item-cancel-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 class TestDataProvider {
 	@Autowired ManagementService managementService;
 	@Autowired DocumentationRepository documentationRepository;
+	@Autowired MultipartFileFactory multipartFileFactory;
 
 	@PostConstruct
 	void insertTestData() {
@@ -43,7 +44,7 @@ class TestDataProvider {
 		managementService.setVersionFile(
 				angular.getId(),
 				v1_3_13.getId(),
-				MultipartFileFactory.fromFile(new File("/home/pawel/Desktop", fileName)));
+				multipartFileFactory.fromFile(new File("/home/pawel/Desktop", fileName)));
 
 		managementService.updateRewriteRules(
 				angular.getId(), v1_3_13.getId(),

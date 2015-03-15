@@ -1,5 +1,7 @@
 # first usable version
+* !!! create tests for routing
 * !!!! use protractor and start writing automated integration tests
+* !!!!! start moving version files using InputStream and OutputStream to avoid out ot memory errors and decrease memory usage
 * !!! create start/initial/dashboard page (HOME)
 * !!! runnable application (in file db in user home, with database migration scripts, deployment directory).
 * !! cleanup not necessary configurations after adding spring boot
@@ -8,6 +10,9 @@
 * !! in manage documentations page remember currently expanded documentations and versions
 * !! online documentation repository - store documentations configuration in remote location for easier local deployment
 * !! add support for other files then .zip
+* !!! introduce notifications (pick existing notification library)
+* !!! add progress bar for pending requests
+* !!!! create managable service for cleaning temporary data on app start and shutdown
 * ! redeploy should use already assigned port (no port change after deploy)
 * redeploy should not unizp files if file wasn't modified
 
@@ -22,3 +27,5 @@
 
 # technical
 * evaluate and maybe try to use http://jscs.info/rules.html
+* try to avoid extracting documentations from archives. Maybe it will be possible to serve them from archived files
+* lazy deployment - do ont deploy unless needed, and undeploy if all tabs closed?

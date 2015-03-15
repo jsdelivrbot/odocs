@@ -2,7 +2,7 @@
 
 angular
   .module('docs.settings')
-  .factory('documentationService', function($q, $rootScope, DOCS, httpClient, _) {
+  .factory('documentationService', function($q, httpClient, _, documentationChangeService) {
     return {
       version: {
         save: saveVersion,
@@ -43,7 +43,7 @@ angular
     }
 
     function emitDocumentationChangeEvent(response) {
-      $rootScope.$emit(DOCS.onDocumentationUpdate);
+      documentationChangeService.documentationChange();
       return response;
     }
 

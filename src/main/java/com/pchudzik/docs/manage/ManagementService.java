@@ -1,5 +1,7 @@
 package com.pchudzik.docs.manage;
 
+import com.pchudzik.docs.feed.model.Feed;
+import com.pchudzik.docs.feed.model.RewriteRule;
 import com.pchudzik.docs.manage.dto.DocumentationDto;
 import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.Documentation;
@@ -25,7 +27,7 @@ import static java.util.stream.Collectors.toList;
  * Created by pawel on 08.02.15.
  */
 @Service
-class ManagementService {
+public class ManagementService {
 	final DocumentationRepository documentationRepository;
 	final VersionRepository versionRepository;
 	final UrlRewriteRuleRepository urlRewriteRuleRepository;
@@ -81,6 +83,19 @@ class ManagementService {
 		version.updateFile(file.getOriginalFilename(), file.getContentType(), file.getInputStream());
 
 		serverRegistry.deploy(version);
+	}
+
+	@Transactional
+	public VersionDto updateVersion(String documentationId, Feed feed, MultipartFile file) {
+		final VersionDto versionDto = addVersion(documentationId, feed.asVersionDto());
+		setVersionFile(documentationId, versionDto.getId(), file);
+		updateRewriteRules(
+				documentationId,
+				versionDto.getId(),
+				feed.getRewriteRules().stream()
+						.map(RewriteRule::asUrlRewriteRule)
+						.collect(toList()));
+		return versionDto;
 	}
 
 	@Transactional
