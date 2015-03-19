@@ -1,4 +1,4 @@
-package com.pchudzik.docs.utils.http;
+package com.pchudzik.docs.utils.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -21,10 +21,6 @@ public class JsonMockMvcResultMatchers {
 
 	public static JsonMockMvcResultMatchers jsonContent() {
 		return new JsonMockMvcResultMatchers();
-	}
-
-	public static String fixJson(String json) {
-		return json.replaceAll("'", "\"");
 	}
 
 	public ResultMatcher isEqual(String expectedJson) {

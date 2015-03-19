@@ -14,7 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 @MappedSuperclass
 abstract class NameAware extends BaseEntity {
-	@Getter String name;
+	@Getter protected String name;
 
 	public void updateName(String name) {
 		Preconditions.checkArgument(StringUtils.isNoneBlank(name));
