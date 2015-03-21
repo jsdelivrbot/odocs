@@ -1,5 +1,6 @@
 .gradle
 .idea
 build
-webapp
 src/main/generated
+src/main/resources/public
+

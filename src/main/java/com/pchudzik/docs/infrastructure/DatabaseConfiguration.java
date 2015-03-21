@@ -41,7 +41,7 @@ public class DatabaseConfiguration {
 	}
 
 	@Bean
-	EntityManagerFactory entityManagerFactory() {
+	LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 		factoryBean.setDataSource(dataSource());
 		factoryBean.setPackagesToScan("com.pchudzik.docs");
@@ -54,13 +54,12 @@ public class DatabaseConfiguration {
 				entry("jadira.usertype.javaZone", "UTC"),
 				entry("jadira.usertype.databaseZone", "UTC")
 		).collect(toMap(entry -> (String) entry.getKey(), Entry::getValue)));
-		factoryBean.afterPropertiesSet();
-		return factoryBean.getObject();
+		return factoryBean;
 	}
 
 	@Bean
-	PlatformTransactionManager transactionManager() {
-		return new JpaTransactionManager(entityManagerFactory());
+	PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+		return new JpaTransactionManager(emf);
 	}
 
 	private Entry<String, Object> entry(String name, Object value) {
