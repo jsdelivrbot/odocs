@@ -1,7 +1,8 @@
 # first usable version
 * !!!! use protractor and start writing automated integration tests
 * !!! create start/initial/dashboard page (HOME)
-* !!! runnable application (in file db in user home, with database migration scripts, deployment directory, embedded jetty server).
+* !!! runnable application (in file db in user home, with database migration scripts, deployment directory).
+* !! cleanup not necessary configurations after adding spring boot
 * !!! jetty upgrade (or downgrade) - according to guys from jetty version M3 should work better
 * !!! create database restrictions and apply @Valid for input beans to avoid invalid objects creation
 * !! in manage documentations page remember currently expanded documentations and versions
