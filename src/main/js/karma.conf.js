@@ -43,6 +43,7 @@ module.exports = function(config) {
       'bower_components/textAngular/dist/textAngular.min.js',
       'bower_components/ng-file-upload/angular-file-upload.js',
       'bower_components/sprintf/src/sprintf.js',
+      'app/utils/test/**/*.module.js',
       'app/utils/test/**/*.js',
       'app/**/*.module.js',
       'app/**/*.js',

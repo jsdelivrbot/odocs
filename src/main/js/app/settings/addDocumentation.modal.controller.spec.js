@@ -6,10 +6,9 @@ describe('addDocumentation.modal.controller.spec.js', function() {
   var $controller;
   var titles;
 
-  var promiseResolver;
-  var saveDeferred;
+  var deferredHelper;
   var modalInstanceMock;
-  var documentationServiceMock;
+  var saveDocumentation;
 
   var withoutDocumentation = { doc: null };
   var anyDocumentation = {
@@ -18,26 +17,18 @@ describe('addDocumentation.modal.controller.spec.js', function() {
       name: 'name'
     }};
 
-  beforeEach(module('docs.settings'));
-  beforeEach(inject(function(_$controller_, _$q_, $rootScope, AddDocumentationModalConstant) {
+  beforeEach(module('docs.test', 'docs.settings'));
+  beforeEach(inject(function(_$controller_, _$q_, $rootScope, modalInstanceMockFactory, _deferredHelper_, AddDocumentationModalConstant) {
     $q = _$q_;
     $controller = _$controller_;
     scope = $rootScope.$new();
     titles = AddDocumentationModalConstant.title;
-    promiseResolver = createPromiseResolver(scope);
+    deferredHelper = _deferredHelper_;
+    modalInstanceMock = modalInstanceMockFactory();
   }));
 
   beforeEach(function() {
-    documentationServiceMock = {
-      documentation: {
-        save: jasmine.createSpy('save documentation').and.callFake(function() {
-          saveDeferred = $q.defer();
-          return saveDeferred.promise;
-        })
-      }
-    };
-
-    modalInstanceMock = createModalInstance();
+    saveDocumentation = deferredHelper.createFn();
   });
 
   describe('new documentation creation', function() {
@@ -56,7 +47,7 @@ describe('addDocumentation.modal.controller.spec.js', function() {
       scope.documentationName = 'name';
       scope.save();
 
-      expect(documentationServiceMock.documentation.save)
+      expect(saveDocumentation)
         .toHaveBeenCalledWith(withoutId, { name:'name' });
     });
   });
@@ -75,7 +66,7 @@ describe('addDocumentation.modal.controller.spec.js', function() {
       scope.documentationName = 'new name';
       scope.save();
 
-      expect(documentationServiceMock.documentation.save)
+      expect(saveDocumentation)
         .toHaveBeenCalledWith('id', {name: 'new name'});
     });
   });
@@ -84,12 +75,17 @@ describe('addDocumentation.modal.controller.spec.js', function() {
     createController(withoutDocumentation);
 
     scope.save();
-    promiseResolver.resolve(saveDeferred, 'response');
+    saveDocumentation.deferred.resolveAndApply('response');
 
     expect(modalInstanceMock.close).toHaveBeenCalledWith('response');
   });
 
   function createController(options) {
+    var documentationServiceMock = {
+      documentation: {
+        save: saveDocumentation
+      }
+    };
     $controller('AddDocumentationModal', {
       $scope: scope,
       $modalInstance: modalInstanceMock,

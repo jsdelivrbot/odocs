@@ -25,10 +25,7 @@
     "angular": false,
     "module": false,
     "inject": false,
-    "runParametrizedTest": false,
-    "createPromiseResolver": false,
-    "createModalInstance": false,
-    "createModalMock": false
+    "runParametrizedTest": false
 //    "inject": false,
 //    "describe": false,
 //    "beforeEach": false,

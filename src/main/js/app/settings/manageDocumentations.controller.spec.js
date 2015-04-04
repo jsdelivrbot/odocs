@@ -1,55 +1,33 @@
 'use strict';
 
 describe('manageDocumentations.controller.spec.js', function() {
-  var $q;
   var scope;
   var $controller;
   var documentationServiceMock;
   var modalMock;
 
-  var promiseResolver;
-  var documentationListDeferred;
-  var versionRemoveDeferred;
-  var versionMoveDeferred;
-  var documentationMoveDeferred;
-  var documentationRemoveDeferred;
+  var deferredHelper;
 
-  beforeEach(module('docs.settings'));
-  beforeEach(inject(function(_$controller_, _$q_, $rootScope) {
-    $q = _$q_;
+  beforeEach(module('docs.test', 'docs.settings'));
+  beforeEach(inject(function(_$controller_, _$q_, _modalMock_, _deferredHelper_, $rootScope) {
+    deferredHelper = _deferredHelper_;
+    modalMock = _modalMock_;
     $controller = _$controller_;
     scope = $rootScope.$new();
   }));
 
   beforeEach(function() {
-    modalMock = createModalMock($q);
-    promiseResolver = createPromiseResolver(scope);
-    var moveVersion = jasmine.createSpy('move version function').and.callFake(function() {
-      versionMoveDeferred = $q.defer();
-      return versionMoveDeferred.promise;
-    });
-    var moveDocumentation = jasmine.createSpy('move documentation function').and.callFake(function() {
-      documentationMoveDeferred = $q.defer();
-      return documentationMoveDeferred.promise;
-    });
+    var moveVersion = deferredHelper.createFn();
+    var moveDocumentation = deferredHelper.createFn();
     documentationServiceMock = {
       documentation: {
-        list: function() {
-          documentationListDeferred = $q.defer();
-          return documentationListDeferred.promise;
-        },
-        remove: function() {
-          documentationRemoveDeferred = $q.defer();
-          return documentationListDeferred.promise;
-        },
+        list: deferredHelper.createFn(),
+        remove: deferredHelper.createFn(),
         moveUp: moveDocumentation,
         moveDown: moveDocumentation
       },
       version: {
-        remove: function() {
-          versionRemoveDeferred = $q.defer();
-          return versionRemoveDeferred.promise;
-        },
+        remove: deferredHelper.createFn(),
         moveUp: moveVersion,
         moveDown: moveVersion
       }
@@ -82,8 +60,8 @@ describe('manageDocumentations.controller.spec.js', function() {
 
     //when
     scope.removeVersion(doc, versionToRemove);
-    promiseResolver.resolve(versionRemoveDeferred);
-    promiseResolver.resolve(documentationListDeferred, [documentation('1', otherVersion)]);
+    documentationServiceMock.version.remove.deferred.resolveAndApply();
+    documentationServiceMock.documentation.list.deferred.resolveAndApply([documentation('1', otherVersion)]);
 
     //then
     expect(scope.documentations[0].versions).toEqual([_.assign({isOpen: false}, otherVersion)]);
@@ -96,8 +74,8 @@ describe('manageDocumentations.controller.spec.js', function() {
 
     //when
     scope.removeDocumentation(docToRemove);
-    promiseResolver.resolve(documentationRemoveDeferred);
-    promiseResolver.resolve(documentationListDeferred, [documentation('other')]);
+    documentationServiceMock.documentation.remove.deferred.resolveAndApply();
+    documentationServiceMock.documentation.list.deferred.resolveAndApply([documentation('other')]);
 
     //then
     expect(_.first(scope.documentations).isOpen).toBeFalsy();
@@ -109,8 +87,8 @@ describe('manageDocumentations.controller.spec.js', function() {
 
     //when
     scope.editDocumentation(doc);
-    promiseResolver.resolve(modalMock.openDeferred(), doc);
-    promiseResolver.resolve(documentationListDeferred, [doc]);
+    modalMock.openDeferred().resolveAndApply(doc);
+    documentationServiceMock.documentation.list.deferred.resolveAndApply([doc]);
 
     //then
     expect(_.first(scope.documentations).isOpen).toBeTruthy();
@@ -123,8 +101,8 @@ describe('manageDocumentations.controller.spec.js', function() {
 
     //when
     scope.editVersion(doc, toEdit);
-    promiseResolver.resolve(modalMock.openDeferred(), toEdit);
-    promiseResolver.resolve(documentationListDeferred, [doc]);
+    modalMock.openDeferred().resolveAndApply(toEdit);
+    documentationServiceMock.documentation.list.deferred.resolveAndApply([doc]);
 
     //then
     var editDoc = _.first(scope.documentations);
@@ -161,12 +139,11 @@ describe('manageDocumentations.controller.spec.js', function() {
       ],
       function(moveFnName, serviceFnName, versionProvider) {
         var versionToMove = versionProvider();
-        spyOn(documentationServiceMock.documentation, 'list').and.callThrough();
 
         //when
         scope[moveFnName](doc, versionToMove);
-        promiseResolver.resolve(versionMoveDeferred);
-        promiseResolver.resolve(documentationListDeferred, [doc]);
+        documentationServiceMock.version[serviceFnName].deferred.resolveAndApply();
+        documentationServiceMock.documentation.list.deferred.resolveAndApply([doc]);
 
         expect(doc.isOpen).toBeTruthy();
         expect(versionToMove.isOpen).toBeTruthy();
@@ -195,19 +172,18 @@ describe('manageDocumentations.controller.spec.js', function() {
     });
 
     runParametrizedTest(
-      'should documentation up/down and open moved documentation',
+      'should move documentation up/down and open moved documentation',
       [
         ['moveDocumentationUp', 'moveUp', function() { return secondDoc; } ],
         ['moveDocumentationDown', 'moveDown', function() { return firstDoc; } ]
       ],
       function(moveFnName, serviceFnName, documentationProvider) {
         var documentationToMove = documentationProvider();
-        spyOn(documentationServiceMock.documentation, 'list').and.callThrough();
 
         //when
         scope[moveFnName](documentationToMove);
-        promiseResolver.resolve(documentationMoveDeferred);
-        promiseResolver.resolve(documentationListDeferred, [firstDoc, secondDoc]);
+        documentationServiceMock.documentation[serviceFnName].deferred.resolveAndApply();
+        documentationServiceMock.documentation.list.deferred.resolveAndApply([firstDoc, secondDoc]);
 
         expect(documentationToMove.isOpen).toBeTruthy();
         expect(documentationServiceMock.documentation[serviceFnName]).toHaveBeenCalledWith(documentationToMove.id);
@@ -223,7 +199,7 @@ describe('manageDocumentations.controller.spec.js', function() {
     });
 
     if(maybeDocumentationList) {
-      promiseResolver.resolve(documentationListDeferred, maybeDocumentationList);
+      documentationServiceMock.documentation.list.deferred.resolveAndApply(maybeDocumentationList);
     }
   }
 

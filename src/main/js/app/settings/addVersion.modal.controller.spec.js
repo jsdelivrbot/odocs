@@ -2,18 +2,13 @@
 
 describe('addVersion.modal.controller.spec.js', function() {
   var _;
-  var $q;
   var scope;
   var $controller;
   var titles;
 
-  var promiseResolver;
-  var saveDeferred;
-  var uploadDeferred;
-  var rewriteRulesListDeferred;
-  var rewriteRulesSaveDeferred;
+  var deferredHelper;
   var modalInstanceMock;
-  var documentationServiceMock;
+  var versionServiceMock;
 
   var anyDoc = {id: 'id', name: 'doc'};
   var withoutVersion;
@@ -24,39 +19,23 @@ describe('addVersion.modal.controller.spec.js', function() {
     initialDirectory: 'initial'
   };
 
-  beforeEach(module('docs.settings'));
-  beforeEach(inject(function(_$controller_, _$q_, $rootScope, AddVersionModalConstant, ___) {
+  beforeEach(module('docs.test', 'docs.settings'));
+  beforeEach(inject(function(_$controller_, _$q_, $rootScope, modalInstanceMockFactory, _deferredHelper_, AddVersionModalConstant, ___) {
     _ = ___;
-    $q = _$q_;
     $controller = _$controller_;
     scope = $rootScope.$new();
     titles = AddVersionModalConstant.title;
-    promiseResolver = createPromiseResolver(scope);
+    deferredHelper = _deferredHelper_;
+    modalInstanceMock = modalInstanceMockFactory();
   }));
 
   beforeEach(function() {
-    documentationServiceMock = {
-      version: {
-        uploadFile: jasmine.createSpy('upload version file').and.callFake(function() {
-          uploadDeferred = $q.defer();
-          return uploadDeferred.promise;
-        }),
-        save: jasmine.createSpy('save version').and.callFake(function() {
-          saveDeferred = $q.defer();
-          return saveDeferred.promise;
-        }),
-        listRewriteRules: jasmine.createSpy('list rewrite rules').and.callFake(function() {
-          rewriteRulesListDeferred = $q.defer();
-          return rewriteRulesListDeferred.promise;
-        }),
-        updateRewriteRules: jasmine.createSpy('save rewrite rules').and.callFake(function() {
-          rewriteRulesSaveDeferred = $q.defer();
-          return rewriteRulesSaveDeferred.promise;
-        })
-      }
+    versionServiceMock = {
+      uploadFile: deferredHelper.createFn(),
+      save: deferredHelper.createFn(),
+      listRewriteRules: deferredHelper.createFn(),
+      updateRewriteRules: deferredHelper.createFn()
     };
-
-    modalInstanceMock = createModalInstance();
   });
 
   describe('save spec', function() {
@@ -68,8 +47,8 @@ describe('addVersion.modal.controller.spec.js', function() {
 
       scope.version.files = ['file'];
       scope.save();
-      promiseResolver.resolve(saveDeferred, 'first response');
-      promiseResolver.resolve(uploadDeferred);
+      versionServiceMock.save.deferred.resolveAndApply('first response');
+      versionServiceMock.uploadFile.deferred.resolveAndApply();
 
       expect(modalInstanceMock.close).toHaveBeenCalledWith('first response');
     });
@@ -81,10 +60,10 @@ describe('addVersion.modal.controller.spec.js', function() {
       });
 
       scope.save();
-      promiseResolver.resolve(saveDeferred, 'response');
+      versionServiceMock.save.deferred.resolveAndApply('response');
 
-      expect(documentationServiceMock.version.save).toHaveBeenCalled();
-      expect(documentationServiceMock.version.uploadFile).not.toHaveBeenCalled();
+      expect(versionServiceMock.save).toHaveBeenCalled();
+      expect(versionServiceMock.uploadFile).not.toHaveBeenCalled();
       expect(modalInstanceMock.close).toHaveBeenCalledWith('response');
     });
 
@@ -96,11 +75,11 @@ describe('addVersion.modal.controller.spec.js', function() {
       scope.urlRewriteRules = ['rule1', 'rule2'];
 
       scope.save();
-      promiseResolver.resolve(saveDeferred, 'saved version');
-      promiseResolver.resolve(rewriteRulesSaveDeferred);
+      versionServiceMock.save.deferred.resolveAndApply('saved version');
+      versionServiceMock.updateRewriteRules.deferred.resolveAndApply();
 
-      expect(documentationServiceMock.version.save).toHaveBeenCalled();
-      expect(documentationServiceMock.version.updateRewriteRules).toHaveBeenCalled();
+      expect(versionServiceMock.save).toHaveBeenCalled();
+      expect(versionServiceMock.updateRewriteRules).toHaveBeenCalled();
       expect(modalInstanceMock.close).toHaveBeenCalledWith('saved version');
     });
   });
@@ -118,7 +97,7 @@ describe('addVersion.modal.controller.spec.js', function() {
       createControllerWithRules(rule1);
 
       expect(scope.urlRewriteRules).toEqual([rule1]);
-      expect(documentationServiceMock.version.listRewriteRules).toHaveBeenCalledWith(anyDoc.id, anyVersion.id);
+      expect(versionServiceMock.listRewriteRules).toHaveBeenCalledWith(anyDoc.id, anyVersion.id);
     });
 
     it('should move selected rule up', function() {
@@ -182,18 +161,18 @@ describe('addVersion.modal.controller.spec.js', function() {
 
       //when
       scope.save();
-      promiseResolver.resolve(saveDeferred, 'response');
+      versionServiceMock.save.deferred.resolveAndApply('response');
 
       //then
-      expect(documentationServiceMock.version.updateRewriteRules).not.toHaveBeenCalled();
+      expect(versionServiceMock.updateRewriteRules).not.toHaveBeenCalled();
 
       //when
       scope.moveRuleDown(rule1);
       scope.save();
-      promiseResolver.resolve(saveDeferred, 'response');
+      versionServiceMock.save.deferred.resolveAndApply('response');
 
       //then
-      expect(documentationServiceMock.version.updateRewriteRules).toHaveBeenCalled();
+      expect(versionServiceMock.updateRewriteRules).toHaveBeenCalled();
     });
 
     function createControllerWithRules() {
@@ -201,7 +180,7 @@ describe('addVersion.modal.controller.spec.js', function() {
         doc: anyDoc,
         version: anyVersion
       });
-      promiseResolver.resolve(rewriteRulesListDeferred, _.flatten([arguments]));
+      versionServiceMock.listRewriteRules.deferred.resolveAndApply(_.flatten([arguments]));
     }
 
     function createRewriteRule(val) {
@@ -245,16 +224,16 @@ describe('addVersion.modal.controller.spec.js', function() {
       scope.version.files = ['file'];
       scope.save();
 
-      expect(documentationServiceMock.version.save)
+      expect(versionServiceMock.save)
         .toHaveBeenCalledWith(anyDoc.id, {
           id: withoutId,
           name: 'version',
           rootDirectory: 'dir',
           initialDirectory: 'dir'
         });
-      promiseResolver.resolve(saveDeferred, savedVersion);
+      versionServiceMock.save.deferred.resolveAndApply(savedVersion);
 
-      expect(documentationServiceMock.version.uploadFile)
+      expect(versionServiceMock.uploadFile)
         .toHaveBeenCalledWith(anyDoc.id, savedVersion.id, 'file');
     });
   });
@@ -288,21 +267,24 @@ describe('addVersion.modal.controller.spec.js', function() {
       scope.version.files = ['file'];
       scope.save();
 
-      expect(documentationServiceMock.version.save)
+      expect(versionServiceMock.save)
         .toHaveBeenCalledWith(anyDoc.id, {
           id: anyVersion.id,
           name: 'new name',
           rootDirectory: 'new dir',
           initialDirectory: 'new dir'
         });
-      promiseResolver.resolve(saveDeferred, anyVersion);
+      versionServiceMock.save.deferred.resolveAndApply(anyVersion);
 
-      expect(documentationServiceMock.version.uploadFile)
+      expect(versionServiceMock.uploadFile)
         .toHaveBeenCalledWith(anyDoc.id, anyVersion.id, 'file');
     });
   });
 
   function createController(options) {
+    var documentationServiceMock = {
+      version: versionServiceMock
+    };
     $controller('AddVersionModal', {
       $scope: scope,
       $modalInstance: modalInstanceMock,

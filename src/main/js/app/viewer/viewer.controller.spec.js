@@ -6,31 +6,24 @@ describe('viewer.controller.spec.js', function() {
   var DOCS;
 
   var viewerServiceMock;
-  var promiseResolver;
 
   var scope;
-  var $q;
+  var deferredHelper;
   var $controller;
   var stateMock;
 
-  var deploymentInfoDeferred;
-
   beforeEach(function() {
-    module('docs.viewer');
+    module('docs.test', 'docs.viewer');
 
-    inject(function(_$q_, _$controller_, $rootScope, _DOCS_) {
-      $q = _$q_;
+    inject(function(_$controller_, $rootScope, _deferredHelper_, _DOCS_) {
+      deferredHelper = _deferredHelper_;
       $controller = _$controller_;
       scope = $rootScope.$new();
-      promiseResolver = createPromiseResolver(scope);
       DOCS = _DOCS_;
     });
 
     viewerServiceMock = {
-      deploymentInfo: jasmine.createSpy('viewerService.deploymentInfo').and.callFake(function() {
-        deploymentInfoDeferred = $q.defer();
-        return deploymentInfoDeferred.promise;
-      })
+      deploymentInfo: deferredHelper.createFn()
     };
 
     stateMock = {
@@ -43,7 +36,7 @@ describe('viewer.controller.spec.js', function() {
     createController({ versionId: versionId });
 
     //when
-    promiseResolver.resolve(deploymentInfoDeferred, {});
+    viewerServiceMock.deploymentInfo.deferred.resolveAndApply({});
 
     //then
     expect(scope.$emit).toHaveBeenCalledWith(DOCS.onVersionSelect, versionId);
@@ -60,7 +53,7 @@ describe('viewer.controller.spec.js', function() {
     function(deploymentInfo, urlParam, expectedUrl) {
       createController({ url: urlParam });
 
-      promiseResolver.resolve(deploymentInfoDeferred, deploymentInfo);
+      viewerServiceMock.deploymentInfo.deferred.resolveAndApply(deploymentInfo);
 
       expect(scope.versionUrl).toEqual(expectedUrl);
     });
@@ -68,7 +61,8 @@ describe('viewer.controller.spec.js', function() {
   it('should watch currentUrl and go to state with new url', function() {
     createController();
 
-    promiseResolver.resolve(deploymentInfoDeferred, {protocol: 'http', host: 'example.com', port: '8000'});
+    viewerServiceMock.deploymentInfo.deferred.resolveAndApply({protocol: 'http', host: 'example.com', port: '8000'});
+
     expect(stateMock.go.calls.mostRecent().args).toEqual(['viewer', {versionId: versionId, url: ''}]);
 
     scope.currentUrl = 'http://example.com:8000/new/url';
