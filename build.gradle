@@ -81,9 +81,11 @@ dependencies {
 	testCompile "org.springframework:spring-test:$springVersion"
 	testCompile "org.mockito:mockito-all:1.10.17"
 	testCompile "org.assertj:assertj-core:1.7.0"
-	testCompile "org.mock-server:mockserver-netty:3.9.2"
+	testCompile("org.mock-server:mockserver-netty:3.9.2") {
+		exclude module: "junit"
+	}
 	testCompile("com.googlecode.catch-exception:catch-exception:1.2.0") {
-		exclude module: "hamcrest-core:"
+		exclude module: "hamcrest-core"
 	}
 }
 
