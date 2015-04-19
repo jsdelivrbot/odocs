@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Primary;
 import org.zapodot.jackson.java8.JavaOptionalModule;
 
 @Configuration
-class JsonObjectMapperConfiguration {
+public class JsonObjectMapperConfiguration {
 	@Bean @Primary
-	ObjectMapper objectMapper() {
+	public ObjectMapper objectMapper() {
 		ObjectMapper om = new ObjectMapper();
 		om.registerModule(new JavaOptionalModule());
 		om.registerModule(new JodaModule());

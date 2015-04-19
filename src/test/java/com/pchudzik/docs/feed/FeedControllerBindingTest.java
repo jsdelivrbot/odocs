@@ -1,12 +1,13 @@
 package com.pchudzik.docs.feed;
 
 import com.google.common.collect.ImmutableMap;
-import com.pchudzik.docs.feed.download.DownloadInfo;
-import com.pchudzik.docs.feed.download.DownloadInfoService;
 import com.pchudzik.docs.feed.download.DownloadEventListener;
-import com.pchudzik.docs.feed.download.DownloadSubmitEvent;
+import com.pchudzik.docs.feed.download.DownloadInfo;
+import com.pchudzik.docs.feed.download.DownloadInfoRepository;
+import com.pchudzik.docs.feed.download.DownloadInfoService;
 import com.pchudzik.docs.feed.model.FeedCategory;
 import com.pchudzik.docs.feed.model.FeedInfo;
+import com.pchudzik.docs.utils.FakeTimeProvider;
 import com.pchudzik.docs.utils.http.ControllerTester;
 import lombok.SneakyThrows;
 import org.mockito.Mock;
@@ -18,10 +19,8 @@ import static com.pchudzik.docs.utils.http.HttpRequestBuilders.httpPost;
 import static com.pchudzik.docs.utils.json.JsonHelper.fixJson;
 import static com.pchudzik.docs.utils.json.JsonHelper.jsonFromTemplate;
 import static com.pchudzik.docs.utils.json.JsonMockMvcResultMatchers.jsonContent;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static java.util.Collections.singletonList;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,6 +40,7 @@ public class FeedControllerBindingTest {
 
 	ControllerTester controllerTester;
 
+	@Mock DownloadInfoRepository downloadInfoRepository;
 	@Mock DownloadInfoService downloadInfoService;
 	@Mock OnlineFeedRepository feedRepository;
 
@@ -49,25 +49,25 @@ public class FeedControllerBindingTest {
 		initMocks(this);
 
 		controllerTester = ControllerTester.builder()
-				.controllers(new FeedController(downloadInfoService, feedRepository))
+				.controllers(new FeedController(downloadInfoRepository, downloadInfoService, feedRepository))
 				.build();
 	}
 
 	@Test
 	@SneakyThrows
 	public void should_initialize_download_and_return_downloadId() {
+		final String submitDate = "2015-04-16T18:01:00.000Z";
 		final DownloadInfo downloadInfo = DownloadInfo.builder()
 				.id("id")
+				.timeProvider(new FakeTimeProvider(submitDate))
 				.downloadEventListener(mock(DownloadEventListener.class))
-				.build();
-		downloadInfo.submit(DownloadSubmitEvent.builder()
 				.feedFile(feedFile)
 				.feedName(feedName)
 				.documentationId(docId)
-				.build());
+				.build();
 		when(downloadInfoService.startDownload(docId, feedName, feedFile))
 				.thenReturn(downloadInfo);
-		downloadInfo.requestRemove();
+		downloadInfo.requestAbort();
 
 		//when
 		controllerTester.perform(httpPost("/feeds/downloads", downloadRequestPayload))
@@ -78,14 +78,13 @@ public class FeedControllerBindingTest {
 						"  id: 'id'," +
 						"  submitEvent: {" +
 						"    eventType: 'SUBMIT'," +
-						"    submitDate: null," +
+						"    submitDate: '" + submitDate +"'," +
 						"    feedName: '" + feedName + "'," +
 						"    documentationId: '" + docId + "'," +
 						"    feedFile: '" + feedFile + "'," +
 						"  }," +
-						"  interrupted: true," +
-						"  abortRequested: false," +
-						"  removeRequested: true," +
+						"  abortRequested: true," +
+						"  removeRequested: false," +
 						"  startEvent: null," +
 						"  progressEvent: null," +
 						"  finishEvent: null," +
@@ -100,7 +99,7 @@ public class FeedControllerBindingTest {
 	public void should_list_feed_categories() {
 		final String name = "java";
 		final String info = "info";
-		when(feedRepository.listCategories()).thenReturn(asList(FeedCategory.builder()
+		when(feedRepository.listCategories()).thenReturn(singletonList(FeedCategory.builder()
 				.name(name)
 				.feeds(FeedInfo.builder()
 						.feedFile(feedFile)
@@ -126,13 +125,25 @@ public class FeedControllerBindingTest {
 
 	@Test
 	@SneakyThrows
-	public void should_execute_requested_action_on_item() {
+	public void should_execute_remove_action_on_item() {
 		final String itemId = "itemId";
 
 		//when
 		controllerTester.perform(httpPost("/feeds/downloads/" + itemId + "/actions", fixJson("{action:'REMOVE'}")))
 				.andExpect(status().isOk());
 
-		verify(downloadInfoService).execute(itemId, ActionType.REMOVE);
+		verify(downloadInfoService).removeDownload(itemId);
+	}
+
+	@Test
+	@SneakyThrows
+	public void should_execute_abort_action_on_item() {
+		final String itemId = "itemId";
+
+		//when
+		controllerTester.perform(httpPost("/feeds/downloads/" + itemId + "/actions", fixJson("{action:'ABORT'}")))
+				.andExpect(status().isOk());
+
+		verify(downloadInfoService).abortDownload(itemId);
 	}
 }

@@ -1,4 +1,5 @@
 # first usable version
+* !!! migrate frontend to tabs
 * !!! create tests for routing
 * !!!! use protractor and start writing automated integration tests
 * !!!!! start moving version files using InputStream and OutputStream to avoid out ot memory errors and decrease memory usage
@@ -18,6 +19,7 @@
 
 # future version
 ## features
+* investigate possibilities to automatically update documentation feed (maybe share from application, automated generator?)
 * !! search - index using htmlunit or phantomjs and store collected data for easier search - with prefix search, etc
 * ! favorites - add selected pages to favorites
 * ! history - documentation view history

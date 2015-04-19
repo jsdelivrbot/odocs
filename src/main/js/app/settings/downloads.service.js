@@ -112,6 +112,9 @@ angular
         item.hasSuccess = _.partial(isInState, 'FINISH');
         item.hasError = _.partial(isInState, 'ERROR');
         item.isFinished = _.partial(isInState, ['ABORT', 'FINISH', 'ERROR']);
+        item.getProgress = function() {
+          return item.progress * 100.0;
+        };
 
         return item;
       }
@@ -145,11 +148,11 @@ angular
       function transformAndExecuteAsEventStream(items) {
         _.forEach(items, function(item) {
           _.chain([
-            item.submitEvent, item.startEvent,
-            item.progressEvent,
-            item.abortEvent, item.finishEvent, item.errorEvent,
-            item.removeEvent
-          ])
+              item.submitEvent, item.startEvent,
+              item.progressEvent,
+              item.abortEvent, item.finishEvent, item.errorEvent,
+              item.removeEvent
+            ])
             .compact()
             .map(function(event) {
               return _.assign(event, {id: item.id});

@@ -56,10 +56,10 @@ describe('download.service.spec.js', function() {
           .expectPOST(apiUrl('/feeds/downloads/' + anyId + '/actions'), {action: actionType})
           .respond(200);
 
-        //then
+        //when
         service[actionFnName](anyId)
 
-          //when
+          //then
           .then(function(removedItem) {
             expect(removedItem.id).toEqual(anyId);
             expect(removedItem[propertyName]).toEqual(true);
@@ -248,7 +248,7 @@ describe('download.service.spec.js', function() {
     });
 
   function expectItem(actualItem, expectedItem) {
-    var itemWithoutFunctions = _.omit(actualItem, 'isWaiting', 'isInProgress', 'isPending', 'hasSuccess', 'hasError', 'isAborted', 'isFinished');
+    var itemWithoutFunctions = _.omit(actualItem, 'isWaiting', 'isInProgress', 'isPending', 'hasSuccess', 'hasError', 'isAborted', 'isFinished', 'getProgress');
     expect(itemWithoutFunctions).toEqual(expectedItem);
   }
 

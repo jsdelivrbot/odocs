@@ -3,9 +3,7 @@ package com.pchudzik.docs.feed.download;
 import com.pchudzik.docs.feed.OnlineFeedRepository;
 import com.pchudzik.docs.infrastructure.annotation.TemporaryDirectory;
 import com.pchudzik.docs.manage.ManagementService;
-import com.pchudzik.docs.utils.TimeProvider;
 import com.pchudzik.docs.utils.http.MultipartFileFactory;
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import java.io.File;
  */
 @Service
 class DownloadJobFactory {
-	final TimeProvider timeProvider;
 	final CloseableHttpClient httpClient;
 	final ManagementService managementService;
 	final OnlineFeedRepository feedRepository;
@@ -26,13 +23,11 @@ class DownloadJobFactory {
 
 	@Autowired
 	DownloadJobFactory(
-			TimeProvider timeProvider,
 			CloseableHttpClient httpClient,
 			ManagementService managementService,
 			OnlineFeedRepository feedRepository,
 			MultipartFileFactory multipartFileFactory,
 			@TemporaryDirectory File tmpDir) {
-		this.timeProvider = timeProvider;
 		this.httpClient = httpClient;
 		this.managementService = managementService;
 		this.feedRepository = feedRepository;
@@ -46,7 +41,6 @@ class DownloadJobFactory {
 				.feedRepository(feedRepository)
 				.httpClient(httpClient)
 				.managementService(managementService)
-				.timeProvider(timeProvider)
 				.multipartFileFactory(multipartFileFactory)
 				.tmpDir(tmpDir)
 				.build();

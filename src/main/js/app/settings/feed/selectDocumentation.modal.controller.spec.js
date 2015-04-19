@@ -26,9 +26,7 @@ describe('selectDocumentation.modal.controller.spec.js', function() {
       }
     };
 
-    module('docs.test', 'docs.settings', function($provide) {
-      $provide.value('documentationService', documentationServiceMock);
-    });
+    module('docs.test', 'docs.settings');
 
     inject(function($rootScope, _$controller_, _$q_, modalInstanceMockFactory, _deferredHelper_) {
       $controller = _$controller_;

@@ -3,13 +3,10 @@ package com.pchudzik.docs.feed.download;
 import com.google.common.base.Stopwatch;
 import com.pchudzik.docs.feed.OnlineFeedRepository;
 import com.pchudzik.docs.feed.download.copy.CopyExecutor;
-import com.pchudzik.docs.feed.download.copy.ProgressListener;
 import com.pchudzik.docs.feed.model.Feed;
 import com.pchudzik.docs.manage.ManagementService;
 import com.pchudzik.docs.manage.dto.VersionDto;
-import com.pchudzik.docs.utils.TimeProvider;
 import com.pchudzik.docs.utils.http.MultipartFileFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.function.Supplier;
@@ -33,7 +31,6 @@ import java.util.function.Supplier;
 class DownloadJob implements Runnable {
 	final DownloadInfo downloadInfo;
 
-	final TimeProvider timeProvider;
 	final CloseableHttpClient httpClient;
 	final ManagementService managementService;
 	final OnlineFeedRepository feedRepository;
@@ -42,43 +39,27 @@ class DownloadJob implements Runnable {
 
 	@Override
 	public void run() {
-		downloadInfo.start(DownloadStartEvent.builder()
-				.startDate(timeProvider.now())
-				.build());
+		downloadInfo.start();
 
-		final Feed feed = feedRepository.getFeed(downloadInfo.getFeedFile()
-				.orElseThrow(startingNotSubmittedJobException()));
+		final Feed feed = feedRepository.getFeed(downloadInfo.getFeedFile());
 
 		File savedFile = null;
 		try (final CloseableHttpResponse httpResponse = httpClient.execute(feed.httpRequest())){
 			savedFile = downloadFile(httpResponse);
 
-			if(!downloadInfo.isInterrupted()) {
+			if(downloadInfo.isInterrupted()) {
+				downloadInfo.finish();
+			} else {
 				final VersionDto versionDto = managementService.updateVersion(
-						downloadInfo.getDocumentationId().orElseThrow(startingNotSubmittedJobException()),
+						downloadInfo.getDocumentationId(),
 						feed,
 						multipartFileFactory.fromFile(savedFile));
-				downloadInfo.finish(DownloadFinishEvent.builder()
-						.finishDate(timeProvider.now())
-						.versionId(versionDto.getId())
-						.build());
-			} else {
-				if(downloadInfo.isAbortRequested()) {
-					abortDownloadInfo();
-				} else if(downloadInfo.isRemoveRequested()) {
-					removeDownloadInfo();
-				}
+				downloadInfo.finish(versionDto.getId());
 			}
-
 		} catch (Exception ex) {
-			downloadInfo.error(DownloadErrorEvent.builder()
-					.errorDate(timeProvider.now())
-					.exception(ex)
-					.build());
+			downloadInfo.finish(ex);
 		} finally {
-			if(savedFile != null) {
-				FileUtils.deleteQuietly(savedFile);
-			}
+			FileUtils.deleteQuietly(savedFile);
 		}
 	}
 
@@ -99,49 +80,14 @@ class DownloadJob implements Runnable {
 		try (final FileOutputStream fos = new FileOutputStream(dstFile)) {
 			CopyExecutor.builder()
 					.abortNotifier(downloadInfo::isInterrupted)
-					.progressListener(new FileDownloadProgressListener((int) totalBytes))
-					.source(httpEntity.getContent())
+					.progressListener(bytes -> downloadInfo.progress((int)totalBytes, bytes))
+					.source(new BufferedInputStream(httpEntity.getContent()))
 					.destination(fos)
 					.build()
 					.start();
 			return dstFile;
 		} finally {
 			log.debug("{} bytes downloaded in {} to {}", totalBytes, stopwatch.stop(), dstFile.getAbsolutePath());
-		}
-	}
-
-	private void abortDownloadInfo() {
-		log.info("Download of {} aborted", downloadInfo.getId());
-		downloadInfo.abort(DownloadAbortEvent.builder()
-				.abortDate(timeProvider.now())
-				.build());
-	}
-
-	private void removeDownloadInfo() {
-		log.info("Download {} removed", downloadInfo.getId());
-		downloadInfo.remove(DownloadRemoveEvent.builder()
-				.removalDate(timeProvider.now())
-				.build());
-	}
-
-	@RequiredArgsConstructor
-	private class FileDownloadProgressListener implements ProgressListener {
-		final int totalBytes;
-
-		@Override
-		public void onProgress(int transferredBytes) {
-			final DownloadProgressEvent newProgress = DownloadProgressEvent.builder()
-					.totalBytes(totalBytes)
-					.downloadedBytes(transferredBytes)
-					.build();
-			if(downloadInfo.getProgressEvent() == null) {
-				downloadInfo.progress(newProgress);
-			} else {
-				if(newProgress.getProgress() - downloadInfo.getProgressEvent().getProgress() >= 0.2) {
-					log.trace("downloadId: {} progress: {}", downloadInfo.getId(), newProgress.getProgress());
-					downloadInfo.progress(newProgress);
-				}
-			}
 		}
 	}
 }

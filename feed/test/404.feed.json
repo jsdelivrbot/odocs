@@ -5,9 +5,9 @@
   "initialDirectory": "angular-1.3.14",
   "rootDirectory": "docs",
   "rewriteRules": [
-	{
-	  "regexp": "/docs/api/*",
-	  "replacement": "/docs"
-	}
+    {
+      "regexp": "/docs/api/*",
+      "replacement": "/docs"
+    }
   ]
 }

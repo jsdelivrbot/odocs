@@ -20,7 +20,7 @@ describe('feed.service.spec.js', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should list ala available api', function() {
+  it('should list all available api', function() {
     $httpBackend
       .expectGET(apiUrl('/feeds'))
       .respond(200);

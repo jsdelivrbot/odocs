@@ -37,7 +37,7 @@ public class FeedCategory {
 			return addOperation(category -> category.name = name);
 		}
 
-		public FeedCategoryBuilder feeds(FeedInfo ... feeds) {
+		public FeedCategoryBuilder feeds(FeedInfo... feeds) {
 			return feeds(asList(feeds));
 		}
 

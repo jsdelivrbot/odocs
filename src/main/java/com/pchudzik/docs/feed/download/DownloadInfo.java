@@ -2,20 +2,26 @@ package com.pchudzik.docs.feed.download;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
+import com.pchudzik.docs.feed.download.event.*;
+import com.pchudzik.docs.utils.TimeProvider;
 import com.pchudzik.docs.utils.builder.ObjectBuilder;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Created by pawel on 22.03.15.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
+@RequiredArgsConstructor
 public class DownloadInfo {
+	static final double PROGRESS_STEP = 0.002;
+
+	private final TimeProvider timeProvider;
+
 	@Getter private String id = UUID.randomUUID().toString();
 	private DownloadEventListener downloadEventListener;
 
@@ -30,80 +36,100 @@ public class DownloadInfo {
 	@Getter private DownloadErrorEvent errorEvent;
 	@Getter private DownloadRemoveEvent removeEvent;
 
-	private void updateEvent(DownloadEvent event) {
+	public void start() {
+		startEvent = new DownloadStartEvent(timeProvider.now());
+		notifyListener(startEvent);
+	}
+
+	public void progress(int totalBytes, int downloadedBytes) {
+		final DownloadProgressEvent newProgress = new DownloadProgressEvent(timeProvider.now(), totalBytes, downloadedBytes);
+		if(progressEvent == null) {
+			progressEvent = newProgress;
+			notifyListener(progressEvent);
+		} else {
+			if(newProgress.getProgress() - progressEvent.getProgress() >= PROGRESS_STEP) {
+				log.trace("downloadId: {} progress: {}", id, newProgress.getProgress());
+				progressEvent = newProgress;
+				notifyListener(progressEvent);
+			}
+		}
+		handleAbort(newProgress.getProgressDate());
+	}
+
+	private void submit(String documentationId, String feedName, String feedFile) {
+		this.submitEvent = new DownloadSubmitEvent(timeProvider.now(), documentationId, feedName, feedFile);
+		notifyListener(submitEvent);
+	}
+
+	public void finish() {
+		handleAbort(timeProvider.now());
+		handleRemove(timeProvider.now());
+	}
+
+	public void finish(String versionId) {
+		finishEvent = new DownloadFinishEvent(timeProvider.now(), versionId);
+		notifyListener(finishEvent);
+		finish();
+	}
+
+	public void finish(Exception ex) {
+		this.errorEvent = errorEvent;
+		notifyListener(errorEvent);
+		finish();
+	}
+
+	private void notifyListener(DownloadEvent event) {
 		downloadEventListener.onEvent(this, event);
 	}
 
-	public void submit(DownloadSubmitEvent submitEvent) {
-		this.submitEvent = submitEvent;
-		updateEvent(submitEvent);
+	private void handleAbort(DateTime abortDate) {
+		if(abortRequested) {
+			this.abortEvent = new DownloadAbortEvent(abortDate);
+			log.info("Download of {} aborted", getId());
+			notifyListener(abortEvent);
+		}
 	}
 
-	public void start(DownloadStartEvent downloadStartEvent) {
-		this.startEvent = downloadStartEvent;
-		updateEvent(downloadStartEvent);
-	}
-
-	public void progress(DownloadProgressEvent progressEvent) {
-		this.progressEvent = progressEvent;
-		updateEvent(progressEvent);
-	}
-
-	public void abort(DownloadAbortEvent abortEvent) {
-		this.abortEvent = abortEvent;
-		updateEvent(abortEvent);
-	}
-
-	public void finish(DownloadFinishEvent finishEvent) {
-		this.finishEvent = finishEvent;
-		updateEvent(finishEvent);
-	}
-
-	public void error(DownloadErrorEvent errorEvent) {
-		this.errorEvent = errorEvent;
-		updateEvent(errorEvent);
-	}
-
-	public void remove(DownloadRemoveEvent removeEvent) {
-		this.removeEvent = removeEvent;
-		updateEvent(removeEvent);
-	}
-
-	@JsonIgnore
-	public Optional<DateTime> getSubmitDate() {
-		return Optional.ofNullable(submitEvent)
-				.map(event -> event.getSubmitDate());
-	}
-
-	@JsonIgnore
-	public Optional<String> getFeedFile() {
-		return Optional.ofNullable(submitEvent)
-				.map(event -> event.getFeedFile());
-	}
-
-	public boolean isInterrupted() {
-		return abortRequested || removeRequested;
-	}
-
-	@JsonIgnore
-	boolean isRunning() {
-		return abortEvent == null && removeEvent == null && finishEvent == null && errorEvent == null;
-	}
-
-	@JsonIgnore
-	public Optional<String> getDocumentationId() {
-		return Optional.ofNullable(submitEvent)
-				.map(event -> event.getDocumentationId());
+	private void handleRemove(DateTime removeDate) {
+		if(removeRequested) {
+			this.removeEvent = new DownloadRemoveEvent(removeDate);
+			log.info("Download {} removed", getId());
+			notifyListener(removeEvent);
+		}
 	}
 
 	public void requestAbort() {
-		Preconditions.checkArgument(!isInterrupted() && isRunning(), "Can not abort interrupted job");
+		Preconditions.checkState(!isDone(), "Can not abort finished job");
 		abortRequested = true;
 	}
 
 	public void requestRemove() {
-		Preconditions.checkArgument(!isInterrupted(), "Can not abort interrupted job");
+		Preconditions.checkState(isDone() || abortEvent != null, "Can not remove running job");
 		removeRequested = true;
+		handleRemove(timeProvider.now());
+	}
+
+	@JsonIgnore
+	public DateTime getSubmitDate() {
+		return submitEvent.getSubmitDate();
+	}
+
+	@JsonIgnore
+	public String getFeedFile() {
+		return submitEvent.getFeedFile();
+	}
+
+	@JsonIgnore
+	public String getDocumentationId() {
+		return submitEvent.getDocumentationId();
+	}
+
+	protected boolean isInterrupted() {
+		return abortRequested || removeRequested;
+	}
+
+	private boolean isDone() {
+		return finishEvent != null || errorEvent != null;
 	}
 
 	public static DownloadInfoBuilder builder() {
@@ -111,16 +137,45 @@ public class DownloadInfo {
 	}
 
 	public static class DownloadInfoBuilder extends ObjectBuilder<DownloadInfoBuilder, DownloadInfo> {
+		private TimeProvider timeProvider;
+		private String documentationId;
+		private String feedName;
+		private String feedFile;
+
 		public DownloadInfoBuilder id(String id) {
 			return addOperation(info -> info.id = id);
 		}
 		public DownloadInfoBuilder downloadEventListener(DownloadEventListener listener) {
 			return addOperation(info -> info.downloadEventListener = listener);
 		}
+		public DownloadInfoBuilder timeProvider(TimeProvider timeProvider) {
+			this.timeProvider = timeProvider;
+			return this;
+		}
+
+		public DownloadInfoBuilder documentationId(String id) {
+			this.documentationId = id;
+			return this;
+		}
+
+		public DownloadInfoBuilder feedName(String feedName) {
+			this.feedName = feedName;
+			return this;
+		}
+
+		public DownloadInfoBuilder feedFile(String feedFile) {
+			this.feedFile = feedFile;
+			return this;
+		}
+
+		@Override
+		protected void postConstruct(DownloadInfo object) {
+			object.submit(documentationId, feedName, feedFile);
+		}
 
 		@Override
 		protected DownloadInfo createObject() {
-			return new DownloadInfo();
+			return new DownloadInfo(timeProvider);
 		}
 	}
 }

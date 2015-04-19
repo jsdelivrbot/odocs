@@ -1,6 +1,7 @@
 package com.pchudzik.docs.feed;
 
 import com.pchudzik.docs.feed.download.DownloadInfo;
+import com.pchudzik.docs.feed.download.DownloadInfoRepository;
 import com.pchudzik.docs.feed.download.DownloadInfoService;
 import com.pchudzik.docs.feed.model.FeedCategory;
 import lombok.Getter;
@@ -15,11 +16,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/feeds")
 class FeedController {
+	private final DownloadInfoRepository downloadInfoRepository;
 	private final DownloadInfoService downloadInfoService;
 	private final OnlineFeedRepository feedRepository;
 
 	@Autowired
-	FeedController(DownloadInfoService downloadInfoService, OnlineFeedRepository feedRepository) {
+	FeedController(
+			DownloadInfoRepository downloadInfoRepository,
+			DownloadInfoService downloadInfoService,
+			OnlineFeedRepository feedRepository) {
+		this.downloadInfoRepository = downloadInfoRepository;
 		this.downloadInfoService = downloadInfoService;
 		this.feedRepository = feedRepository;
 	}
@@ -36,12 +42,18 @@ class FeedController {
 
 	@RequestMapping(value = "/downloads/{id}/actions", method = RequestMethod.POST)
 	void runActionOnDownload(@PathVariable String id, @RequestBody ActionRequest actionRequest) {
-		downloadInfoService.execute(id, actionRequest.getAction());
+		if(actionRequest.getAction() == ActionType.ABORT) {
+			downloadInfoService.abortDownload(id);
+		} else if(actionRequest.getAction() == ActionType.REMOVE) {
+			downloadInfoService.removeDownload(id);
+		} else {
+			throw new UnsupportedOperationException("Unsupported action " + actionRequest.getAction());
+		}
 	}
 
 	@RequestMapping(value = "/downloads", method = RequestMethod.GET)
 	List<DownloadInfo> downloadInfos() {
-		return downloadInfoService.listDownloads();
+		return downloadInfoRepository.listDownloads();
 	}
 
 	@Getter
@@ -54,5 +66,10 @@ class FeedController {
 	@Getter
 	static class ActionRequest {
 		ActionType action;
+	}
+
+	enum ActionType {
+		ABORT,
+		REMOVE
 	}
 }

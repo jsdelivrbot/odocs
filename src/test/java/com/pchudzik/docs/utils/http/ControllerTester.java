@@ -1,10 +1,19 @@
 package com.pchudzik.docs.utils.http;
 
+import com.pchudzik.docs.infrastructure.JsonObjectMapperConfiguration;
 import com.pchudzik.docs.utils.builder.ObjectBuilder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
@@ -44,6 +53,14 @@ public class ControllerTester {
 		@Override
 		public ControllerTester build() {
 			final ControllerTester tester = super.build();
+			tester.mockMvcBuilder.setMessageConverters(new HttpMessageConverter[]{
+					new StringHttpMessageConverter(),
+					new ByteArrayHttpMessageConverter(),
+					new ResourceHttpMessageConverter(),
+					new SourceHttpMessageConverter<>(),
+					new AllEncompassingFormHttpMessageConverter(),
+					new MappingJackson2HttpMessageConverter(new JsonObjectMapperConfiguration().objectMapper())
+			});
 			tester.initialize();
 			return tester;
 		}

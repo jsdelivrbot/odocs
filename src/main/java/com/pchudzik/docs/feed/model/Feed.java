@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Created by pawel on 12.03.15.
@@ -46,8 +47,7 @@ public class Feed {
 
 	public HttpUriRequest httpRequest() {
 		final HttpGet getFileRequest = new HttpGet(url);
-		getHttpConfiguration().ifPresent(config -> config.getHeaders()
-				.forEach(header -> getFileRequest.addHeader(header.getName(), header.getValue())));
+		getHttpConfiguration().ifPresent(config -> config.getHeaders().forEach(addHeader(getFileRequest)));
 		return getFileRequest;
 	}
 
@@ -62,6 +62,10 @@ public class Feed {
 	private void setRewriteRules(Collection<RewriteRule> rewriteRules) {
 		this.rewriteRules.clear();
 		this.rewriteRules.addAll(rewriteRules);
+	}
+
+	private Consumer<HttpHeader> addHeader(HttpGet getFileRequest) {
+		return header -> getFileRequest.addHeader(header.getName(), header.getValue());
 	}
 
 	@NoArgsConstructor(access = AccessLevel.PRIVATE)

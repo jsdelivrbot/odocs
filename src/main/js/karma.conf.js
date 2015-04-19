@@ -40,7 +40,6 @@ module.exports = function(config) {
       'bower_components/angular-touch/angular-touch.js',
       'bower_components/angular-ui-router/release/angular-ui-router.js',
       'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-      'bower_components/textAngular/dist/textAngular.min.js',
       'bower_components/ng-file-upload/angular-file-upload.js',
       'bower_components/sprintf/src/sprintf.js',
       'app/utils/test/**/*.module.js',

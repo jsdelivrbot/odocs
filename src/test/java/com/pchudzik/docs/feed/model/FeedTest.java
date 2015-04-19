@@ -31,10 +31,7 @@ public class FeedTest {
 		final Feed feed = Feed.builder()
 				.url(fileUrl)
 				.httpConfiguration(HttpConfiguration.builder()
-						.headers(HttpHeader.builder()
-								.name("header")
-								.value("value")
-								.build())
+						.headers(new HttpHeader("header", "value"))
 						.build())
 				.build();
 

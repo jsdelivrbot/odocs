@@ -3,7 +3,7 @@
   "feeds": [{
     "feedFile": "java.feed.json",
     "name": "Java API",
-    "additionalInfoHtml": "<p>By downloading this sources you must accept <a href=\"aaa\">Oracle's License</a>"
+    "additionalInfoHtml": "<p>By downloading this sources you accept <a href=\"http://www.oracle.com/technetwork/java/javase/overview/javase8speclicense-2158700.html\">Oracle's License</a>"
   }]
 },{
   "name": "Angular JS",

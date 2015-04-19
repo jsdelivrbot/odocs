@@ -20,6 +20,8 @@ public abstract class ObjectBuilder<B, T> {
 		buildOperations.forEach(builder -> builder.apply(object));
 		buildValidators.forEach(validator -> validator.validate(object));
 
+		postConstruct(object);
+
 		return object;
 	}
 
@@ -36,6 +38,8 @@ public abstract class ObjectBuilder<B, T> {
 	}
 
 	protected abstract T createObject();
+
+	protected void postConstruct(T object) {}
 
 	@FunctionalInterface
 	protected interface BuildOperation<T> {

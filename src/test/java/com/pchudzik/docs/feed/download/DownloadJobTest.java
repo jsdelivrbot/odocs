@@ -6,6 +6,7 @@ import com.pchudzik.docs.infrastructure.HttpClientsConfiguration;
 import com.pchudzik.docs.manage.ManagementService;
 import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.DocumentationVersion;
+import com.pchudzik.docs.utils.FakeTimeProvider;
 import com.pchudzik.docs.utils.TimeProvider;
 import com.pchudzik.docs.utils.http.MultipartFileFactory;
 import lombok.SneakyThrows;
@@ -23,7 +24,6 @@ import org.testng.annotations.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Optional;
 
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -42,8 +42,8 @@ public class DownloadJobTest {
 	private final byte [] SMALL_FILE = RandomUtils.nextBytes(1);
 	private final DateTime NOW = DateTime.now();
 
+	TimeProvider timeProvider = new FakeTimeProvider(NOW);
 	@Mock OnlineFeedRepository feedRepository;
-	@Mock TimeProvider timeProvider;
 	@Mock ManagementService managementService;
 	@Mock DownloadInfo downloadInfo;
 	MultipartFileFactory multipartFileFactory;
@@ -70,11 +70,9 @@ public class DownloadJobTest {
 		initMocks(this);
 		mockServer.reset();
 		tmpDirectory = Files.createTempDirectory(new File("build").toPath(), "DownloadJobTest").toFile();
-		when(timeProvider.now()).thenReturn(NOW);
 		multipartFileFactory = new MultipartFileFactory(tmpDirectory);
 
 		downloadJobFactory = new DownloadJobFactory(
-				timeProvider,
 				new HttpClientsConfiguration().httpClient(),
 				managementService,
 				feedRepository,
@@ -95,7 +93,7 @@ public class DownloadJobTest {
 		//when
 		job.run();
 
-		verify(downloadInfo).start(any(DownloadStartEvent.class));
+		verify(downloadInfo).start();
 	}
 
 	@Test
@@ -106,15 +104,16 @@ public class DownloadJobTest {
 		job.run();
 
 		//then
-		verify(downloadInfo, atLeastOnce()).progress(any(DownloadProgressEvent.class));
+		verify(downloadInfo, atLeastOnce()).progress(anyInt(), anyInt());
 	}
 
 	@Test
 	public void should_broadcast_on_finish_event() {
+		final String versionId = "id";
 		final DownloadJob downloadJob = setupSimpleFileDownload(SC_OK, FEED_FILE, SMALL_FILE);
 		when(managementService.updateVersion(anyString(), any(Feed.class), any(MultipartFile.class)))
 				.thenReturn(new VersionDto(DocumentationVersion.builder()
-						.id("id")
+						.id(versionId)
 						.name("name")
 						.build()));
 
@@ -122,7 +121,7 @@ public class DownloadJobTest {
 		downloadJob.run();
 
 		//then
-		verify(downloadInfo).finish(any(DownloadFinishEvent.class));
+		verify(downloadInfo).finish(versionId);
 	}
 
 	@Test
@@ -133,7 +132,7 @@ public class DownloadJobTest {
 		downloadJob.run();
 
 		//then
-		verify(downloadInfo).error(any(DownloadErrorEvent.class));
+		verify(downloadInfo).finish(any(Exception.class));
 	}
 
 	@Test
@@ -163,9 +162,9 @@ public class DownloadJobTest {
 	}
 
 	private DownloadJob setupSimpleFileDownload(int statusCode, String feedFile, byte[] file) {
-		when(downloadInfo.getFeedFile()).thenReturn(Optional.of(FEED_FILE));
+		when(downloadInfo.getFeedFile()).thenReturn(FEED_FILE);
 		when(downloadInfo.getId()).thenReturn("id");
-		when(downloadInfo.getDocumentationId()).thenReturn(Optional.of("docId"));
+		when(downloadInfo.getDocumentationId()).thenReturn("docId");
 		mockServer
 				.when(HttpRequest.request()
 								.withMethod("GET")

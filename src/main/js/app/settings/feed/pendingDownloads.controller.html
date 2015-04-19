@@ -14,8 +14,8 @@
         </div>
         <progressbar class="progress-striped active"
                      ng-show="item.isInProgress()"
-                     value="item.progress">
-          {{item.progress | number:1}}% - {{item.downloadedBytes | toMb:2 }} MB out of {{item.totalBytes | toMb:2}} MB
+                     value="item.getProgress()">
+          {{item.getProgress() | number:1}}% - {{item.downloadedBytes | toMb:2 }} MB out of {{item.totalBytes | toMb:2}} MB
         </progressbar>
         <div ng-show="item.hasSuccess()">
           {{item.totalBytes | toMb:2}}MB downloaded in <time-duration from="item.submitDate" to="item.finishDate"></time-duration>
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div ng-show="item.isAborted()">
-          {{item.abortDate}}
+          Download aborted
         </div>
       </div>
 
