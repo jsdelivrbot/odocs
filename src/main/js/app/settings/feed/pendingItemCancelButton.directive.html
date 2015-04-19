@@ -1,10 +1,10 @@
 <button class="btn"
-        ng-class="buttonClass(item)"
-        ng-click="onRemove({item: item})"
-        ng-show="isVisible(item)"
-        ng-disabled="isActionAlreadyRequested(item)">
-  <spinner active="isActionAlreadyRequested(item)"></spinner>
-  <i class="glyphicon glyphicon-trash"
-     ng-hide="isActionAlreadyRequested(item)"></i>
-  {{ actionText(item) }}
+				ng-class="buttonClass(item)"
+				ng-click="onRemove({item: item})"
+				ng-show="isVisible(item)"
+				ng-disabled="isActionAlreadyRequested(item)">
+	<spinner active="isActionAlreadyRequested(item)"></spinner>
+	<i class="glyphicon glyphicon-trash"
+		 ng-hide="isActionAlreadyRequested(item)"></i>
+	{{ actionText(item) }}
 </button>

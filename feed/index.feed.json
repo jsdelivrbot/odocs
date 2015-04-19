@@ -1,28 +1,40 @@
-[{
-  "name": "Java",
-  "feeds": [{
-    "feedFile": "java.feed.json",
-    "name": "Java API",
-    "additionalInfoHtml": "<p>By downloading this sources you accept <a href=\"http://www.oracle.com/technetwork/java/javase/overview/javase8speclicense-2158700.html\">Oracle's License</a>"
-  }]
-},{
-  "name": "Angular JS",
-  "feeds": [{
-    "feedFile": "angular/angular-1.3.13.feed.json",
-    "name": "Angular 1.3.13"
-  },{
-    "feedFile": "angular/angular-1.3.14.feed.json",
-    "name": "Angular 1.3.14"
-  }]
-},{
-  "name": "Test feeds",
-  "feeds": [{
-    "feedFile": "test/dynamic.feed.json",
-    "name": "Dynamic page with html5 mode urls",
-    "additionalInfoHtml": "<b>There is no point in installing this documentation it's test documentation</b>"
-  },{
-    "feedFile": "test/404.feed.json",
-    "name": "Broken feed example",
-    "additionalInfoHtml": "<b>it's test feed nothing useful here</b> This one will throw 404 error when trying to download file"
-  }]
-}]
+[
+	{
+		"name": "Java",
+		"feeds": [
+			{
+				"feedFile": "java.feed.json",
+				"name": "Java API",
+				"additionalInfoHtml": "<p>By downloading this sources you accept <a href=\"http://www.oracle.com/technetwork/java/javase/overview/javase8speclicense-2158700.html\">Oracle's License</a>"
+			}
+		]
+	},
+	{
+		"name": "Angular JS",
+		"feeds": [
+			{
+				"feedFile": "angular/angular-1.3.13.feed.json",
+				"name": "Angular 1.3.13"
+			},
+			{
+				"feedFile": "angular/angular-1.3.14.feed.json",
+				"name": "Angular 1.3.14"
+			}
+		]
+	},
+	{
+		"name": "Test feeds",
+		"feeds": [
+			{
+				"feedFile": "test/dynamic.feed.json",
+				"name": "Dynamic page with html5 mode urls",
+				"additionalInfoHtml": "<b>There is no point in installing this documentation it's test documentation</b>"
+			},
+			{
+				"feedFile": "test/404.feed.json",
+				"name": "Broken feed example",
+				"additionalInfoHtml": "<b>it's test feed nothing useful here</b> This one will throw 404 error when trying to download file"
+			}
+		]
+	}
+]

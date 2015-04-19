@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('docs.utils', [
-  'angularFileUpload',
+	'angularFileUpload',
 
-  'docs.constants'
+	'docs.constants'
 ]);

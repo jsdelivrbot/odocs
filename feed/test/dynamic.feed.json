@@ -1,11 +1,13 @@
 {
-  "updateDate": "2015-03-15T18:16:00.000Z",
-  "name": "Java API",
-  "url": "http://localhost:8000/test/dynamic.zip",
-  "initialDirectory": "dynamic",
-  "rootDirectory": "api",
-  "rewriteRules": [{
-    "regexp": "/dynamic/api/*",
-    "replacement": "/dynamic"
-  }]
+	"updateDate": "2015-03-15T18:16:00.000Z",
+	"name": "Java API",
+	"url": "http://localhost:8000/test/dynamic.zip",
+	"initialDirectory": "dynamic",
+	"rootDirectory": "api",
+	"rewriteRules": [
+		{
+			"regexp": "/dynamic/api/*",
+			"replacement": "/dynamic"
+		}
+	]
 }

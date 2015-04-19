@@ -1,6 +1,6 @@
 'use strict';
 
 angular.module('docs.settings', [
-  'ui.bootstrap',
-  'docs.utils'
+	'ui.bootstrap',
+	'docs.utils'
 ]);

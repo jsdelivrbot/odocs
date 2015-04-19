@@ -1,91 +1,99 @@
 <div class="modal-header">
-  <button ng-click="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  <h3 class="modal-title">{{windowTitle}}</h3>
+	<button ng-click="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+	<h3 class="modal-title">{{windowTitle}}</h3>
 </div>
 <div class="modal-body">
 
-  <tabset justified="true">
-    <tab heading="Settings">
-      <form class="form-horizontal">
-        <div class="form-group">
-          <label for="versionName" class="col-sm-2 control-label">Version</label>
-          <div class="col-sm-10">
-            <input ng-model="version.name"
-                   type="text" class="form-control" id="versionName" placeholder="Name or number of the version">
-          </div>
-        </div>
+	<tabset justified="true">
+		<tab heading="Settings">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="versionName" class="col-sm-2 control-label">Version</label>
 
-        <div class="form-group">
-          <label for="versionFile" class="col-sm-2 control-label">File</label>
-          <div class="col-sm-10">
-            <input ng-file-select ng-multiple="false" ng-model="version.files"
-                   type="file" class="form-control" id="versionFile" placeholder="File with version">
-          </div>
-        </div>
+					<div class="col-sm-10">
+						<input ng-model="version.name" type="text" class="form-control" id="versionName" placeholder="Name or number of the version">
+					</div>
+				</div>
 
-        <div class="form-group">
-          <label for="versionInitialDir" class="col-sm-2 control-label">Initial directory</label>
-          <div class="col-sm-10">
-            <input ng-model="version.initialDirectory"
-                   type="text" class="form-control" id="versionInitialDir" placeholder="Location of index.html inside of root folder">
-          </div>
-        </div>
+				<div class="form-group">
+					<label for="versionFile" class="col-sm-2 control-label">File</label>
 
-        <div class="form-group">
-          <label for="versionRoot" class="col-sm-2 control-label">Version root</label>
-          <div class="col-sm-10">
-            <input ng-model="version.rootDirectory"
-                   type="text" class="form-control" id="versionRoot" placeholder="Path to root folder in version zipped file">
-          </div>
-        </div>
-      </form>
-    </tab>
-    <tab heading="Advanced configuration">
-      <h3>Setup url rewriting rules</h3>
-      <div ng-hide="urlRewriteRules.length">
-        <p>
-          No rewrite rules defined.
-          <a href="" ng-click="addUrlRewriteRule()">Add new one</a>
-        </p>
-      </div>
-      <div ng-show="urlRewriteRules.length">
-        <div>
-          <a href="" ng-click="addUrlRewriteRule()">Add new url rule</a>
-        </div>
+					<div class="col-sm-10">
+						<input ng-file-select ng-multiple="false"
+									 ng-model="version.files" type="file"
+									 class="form-control" id="versionFile"
+									 placeholder="File with version">
+					</div>
+				</div>
 
-        <div class="row">
-          <div class="col-md-4">Regexp</div>
-          <div class="col-md-4">Replacement</div>
-          <div class="col-md-4">&nbsp;</div>
-        </div>
-        <form>
-          <div class="row rule-row" ng-repeat="rule in urlRewriteRules">
-            <div class="col-md-4">
-              <input type="text" class="form-control" ng-model="rule.regexp">
-            </div>
-            <div class="col-md-4">
-              <input type="text" class="form-control" ng-model="rule.replacement">
-            </div>
-            <div class="col-md-4">
-              <button class="btn btn-default" ng-click="moveRuleUp(rule)" ng-disabled="isFirst(rule)">
-                <i class="glyphicon glyphicon glyphicon-chevron-up"></i>
-              </button>
-              <button class="btn btn-default" ng-click="moveRuleDown(rule)" ng-disabled="isLast(rule)">
-                <i class="glyphicon glyphicon glyphicon-chevron-down"></i>
-              </button>
-              <button class="btn btn-danger" ng-click="removeRule(rule)">
-                <i class="glyphicon glyphicon-trash"></i>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </tab>
-  </tabset>
+				<div class="form-group">
+					<label for="versionInitialDir" class="col-sm-2 control-label">Initial directory</label>
+
+					<div class="col-sm-10">
+						<input ng-model="version.initialDirectory"
+									 type="text" class="form-control" id="versionInitialDir"
+									 placeholder="Location of index.html inside of root folder">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="versionRoot" class="col-sm-2 control-label">Version root</label>
+
+					<div class="col-sm-10">
+						<input ng-model="version.rootDirectory" type="text"
+									 class="form-control" id="versionRoot"
+									 placeholder="Path to root folder in version zipped file">
+					</div>
+				</div>
+			</form>
+		</tab>
+		<tab heading="Advanced configuration">
+			<h3>Setup url rewriting rules</h3>
+
+			<div ng-hide="urlRewriteRules.length">
+				<p>
+					No rewrite rules defined.
+					<a href="" ng-click="addUrlRewriteRule()">Add new one</a>
+				</p>
+			</div>
+			<div ng-show="urlRewriteRules.length">
+				<div>
+					<a href="" ng-click="addUrlRewriteRule()">Add new url rule</a>
+				</div>
+
+				<div class="row">
+					<div class="col-md-4">Regexp</div>
+					<div class="col-md-4">Replacement</div>
+					<div class="col-md-4">&nbsp;</div>
+				</div>
+				<form>
+					<div class="row rule-row" ng-repeat="rule in urlRewriteRules">
+						<div class="col-md-4">
+							<input type="text" class="form-control" ng-model="rule.regexp">
+						</div>
+						<div class="col-md-4">
+							<input type="text" class="form-control" ng-model="rule.replacement">
+						</div>
+						<div class="col-md-4">
+							<button class="btn btn-default" ng-click="moveRuleUp(rule)" ng-disabled="isFirst(rule)">
+								<i class="glyphicon glyphicon glyphicon-chevron-up"></i>
+							</button>
+							<button class="btn btn-default" ng-click="moveRuleDown(rule)" ng-disabled="isLast(rule)">
+								<i class="glyphicon glyphicon glyphicon-chevron-down"></i>
+							</button>
+							<button class="btn btn-danger" ng-click="removeRule(rule)">
+								<i class="glyphicon glyphicon-trash"></i>
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</tab>
+	</tabset>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" ng-click="save()">Save</button>
-  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+	<button class="btn btn-primary" ng-click="save()">Save</button>
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
 </div>

@@ -1,22 +1,21 @@
 <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <a class="navbar-brand" ng-click="goHome()" href="">Docs</a>
-    </div>
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" ng-click="goHome()" href="">Docs</a>
+		</div>
 
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <menu-item ng-repeat="doc in documentations" item="doc"></menu-item>
-      </ul>
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<menu-item ng-repeat="doc in documentations" item="doc"></menu-item>
+			</ul>
 
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-          <a href="" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+			<ul class="nav navbar-nav navbar-right">
+				<li>
+					<a href="" ng-click="openSettings()"><i class="glyphicon glyphicon-cog"></i></a>
+				</li>
+			</ul>
+		</div>
+	</div>
 </nav>
 
 <div ui-view></div>
