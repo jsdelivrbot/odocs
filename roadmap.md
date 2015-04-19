@@ -1,4 +1,5 @@
 # first usable version
+* !!!! allow to inject custom javascript code to set and get page url
 * !!! create tests for routing
 * !!!! use protractor and start writing automated integration tests
 * !!!!! start moving version files using InputStream and OutputStream to avoid out ot memory errors and decrease memory usage
