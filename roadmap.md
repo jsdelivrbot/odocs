@@ -1,11 +1,11 @@
 # first usable version
-* !!! migrate frontend to tabs
 * !!! create tests for routing
 * !!!! use protractor and start writing automated integration tests
 * !!!!! start moving version files using InputStream and OutputStream to avoid out ot memory errors and decrease memory usage
 * !!! create start/initial/dashboard page (HOME)
 * !!! runnable application (in file db in user home, with database migration scripts, deployment directory).
 * !! cleanup not necessary configurations after adding spring boot
+* !!! write more tests for feeds module
 * !!! jetty upgrade (or downgrade) - according to guys from jetty version M3 should work better
 * !!! create database restrictions and apply @Valid for input beans to avoid invalid objects creation
 * !! in manage documentations page remember currently expanded documentations and versions
