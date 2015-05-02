@@ -3,8 +3,13 @@ jdk:
   - oraclejdk8
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install build-essential libssl-dev
+  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+  - sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get install -qq build-essential libssl-dev google-chrome-stable
+  - sudo apt-get -f install
   - nvm install v0.12.0
   - nvm use 0.12.0
   - npm install -g bower
@@ -12,9 +17,17 @@ before_install:
   - gem update --system
   - gem install compass
 
+before_script:
+  - export DISPLAY=:99.0
+  - export JS_DIR=src/main/js
+  - sh -e /etc/init.d/xvfb start
+  - (cd $JS_DIR && npm install)
+  - (cd $JS_DIR  && bower install)
+  - (cd $JS_DIR  && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update)
+
 script:
   - ./gradlew check
-  - cd src/main/js
-  - npm install
-  - bower install
-  - grunt
+  - (cd $JS_DIR && grunt)
+  - ./gradlew bootRun > build/run.log &
+  - tail -f build/run.log | grep -m 1 "Tomcat started on port" | xargs echo "" >> build/run.log \;
+  - (cd $JS_DIR && grunt protractor:it)

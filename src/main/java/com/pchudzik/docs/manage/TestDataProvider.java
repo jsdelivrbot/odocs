@@ -24,7 +24,7 @@ class TestDataProvider {
 
 	@PostConstruct
 	void insertTestData() {
-		saveAngular();
+		//saveAngular();
 	}
 
 	private void saveAngular() {
