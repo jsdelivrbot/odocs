@@ -1,11 +1,10 @@
 'use strict';
-var MainPage = require('./pages/Main.page.js');
+var pages = require('./pages/pages.js');
 
 describe('Main page spec', function() {
 	it('should open main page', function() {
-		var mainPage = new MainPage();
-		mainPage.get();
+		pages.mainPage.get();
 
-		expect(mainPage.logo().getText()).toEqual('Docs');
+		expect(pages.mainPage.logo().getText()).toEqual('Docs');
 	});
 });

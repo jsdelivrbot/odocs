@@ -1,0 +1,8 @@
+{
+  "name": "e2e",
+  "version": "0.0.1",
+  "description": "packages required for tests",
+  "dependencies": {
+    "lodash": "~3.8.0"
+  }
+}

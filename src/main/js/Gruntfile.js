@@ -372,7 +372,7 @@ module.exports = function(grunt) {
 			options: {
 				configFile: 'protractor.conf.js'
 			},
-			auto: {
+			local: {
 				options: {
 					args: {
 						baseUrl: 'http://localhost:9000'

@@ -1,7 +1,7 @@
 <div class="well" ng-show="downloadingItems.length">
 	<h4>Download queue</h4>
 
-	<div class="container-fluid">
+	<div class="container-fluid downloadContainer">
 		<div ng-repeat="item in downloadingItems" class="row alert"
 				 ng-class="{'alert-info': item.isPending(),
                     'alert-success': item.hasSuccess(),
