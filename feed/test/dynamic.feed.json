@@ -1,9 +1,9 @@
 {
 	"updateDate": "2015-03-15T18:16:00.000Z",
-	"name": "Java API",
-	"url": "http://localhost:8000/test/dynamic.zip",
-	"initialDirectory": "dynamic",
-	"rootDirectory": "api",
+	"name": "Dynamic html5 mode",
+	"url": "https://rawgit.com/pchudzik/odocs/master/feed/test/dynamic.zip",
+	"initialDirectory": "api",
+	"rootDirectory": "dynamic",
 	"rewriteRules": [
 		{
 			"regexp": "/dynamic/api/*",

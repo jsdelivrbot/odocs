@@ -24,33 +24,33 @@ class TestDataProvider {
 
 	@PostConstruct
 	void insertTestData() {
-		//saveAngular();
+		saveDynamicFeed();
 	}
 
-	private void saveAngular() {
-		final String fileName = "angular-1.3.13.zip";
+	private void saveDynamicFeed() {
+		final String fileName = "dynamic.zip";
 		final DocumentationDto angular = managementService.createNewDocumentation(DocumentationDto.builder()
-				.name("Angular")
+				.name("Test")
 				.build());
 		final VersionDto v1_3_13 = managementService.addVersion(
 				angular.getId(),
 				VersionDto.builder()
 						.fileName(fileName)
 						.fileSize(0)
-						.rootDirectory("angular-1.3.13")
-						.initialDirectory("docs")
-						.name("1.3.13")
+						.rootDirectory("dynamic")
+						.initialDirectory("api")
+						.name("html5 mode urls")
 						.build());
 		managementService.setVersionFile(
 				angular.getId(),
 				v1_3_13.getId(),
-				multipartFileFactory.fromFile(new File("/home/pawel/Desktop", fileName)));
+				multipartFileFactory.fromFile(new File("feed/test", fileName)));
 
 		managementService.updateRewriteRules(
 				angular.getId(), v1_3_13.getId(),
 				asList(UrlRewriteRule.builder()
-						.regexp("/docs/api.*")
-						.replacement("/docs/")
+						.regexp("/dynamic/api/*")
+						.replacement("/dynamic")
 						.build()));
 	}
 }
