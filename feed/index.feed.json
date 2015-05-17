@@ -34,6 +34,11 @@
 				"feedFile": "test/404.feed.json",
 				"name": "Broken feed example",
 				"additionalInfoHtml": "<b>it's test feed nothing useful here</b> This one will throw 404 error when trying to download file"
+			},
+			{
+				"feedFile": "test/frames.feed.json",
+				"name": "Page with framesets",
+				"additionalInfoHtml": "<b>There is no point in installing this documentation it's test documentation</b>"
 			}
 		]
 	}

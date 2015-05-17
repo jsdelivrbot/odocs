@@ -24,16 +24,37 @@ class TestDataProvider {
 
 	@PostConstruct
 	void insertTestData() {
-		saveDynamicFeed();
-	}
-
-	private void saveDynamicFeed() {
-		final String fileName = "dynamic.zip";
-		final DocumentationDto angular = managementService.createNewDocumentation(DocumentationDto.builder()
+		final DocumentationDto testDocumentation = managementService.createNewDocumentation(DocumentationDto.builder()
 				.name("Test")
 				.build());
-		final VersionDto v1_3_13 = managementService.addVersion(
-				angular.getId(),
+
+		saveDynamicFeed(testDocumentation.getId());
+		saveFramesFeed(testDocumentation.getId());
+	}
+
+	private void saveFramesFeed(String documentationId) {
+		final String fileName = "frames.zip";
+
+		final VersionDto withFramesVersion = managementService.addVersion(
+				documentationId,
+				VersionDto.builder()
+						.fileName(fileName)
+						.fileSize(0)
+						.rootDirectory("frames")
+						.name("frameset page")
+						.build());
+
+		managementService.setVersionFile(
+				documentationId,
+				withFramesVersion.getId(),
+				multipartFileFactory.fromFile(new File("feed/test", fileName)));
+	}
+
+	private void saveDynamicFeed(String documentationId) {
+		final String fileName = "dynamic.zip";
+
+		final VersionDto html5UrlsVersion = managementService.addVersion(
+				documentationId,
 				VersionDto.builder()
 						.fileName(fileName)
 						.fileSize(0)
@@ -42,12 +63,12 @@ class TestDataProvider {
 						.name("html5 mode urls")
 						.build());
 		managementService.setVersionFile(
-				angular.getId(),
-				v1_3_13.getId(),
+				documentationId,
+				html5UrlsVersion.getId(),
 				multipartFileFactory.fromFile(new File("feed/test", fileName)));
 
 		managementService.updateRewriteRules(
-				angular.getId(), v1_3_13.getId(),
+				documentationId, html5UrlsVersion.getId(),
 				asList(UrlRewriteRule.builder()
 						.regexp("/dynamic/api/*")
 						.replacement("/dynamic")
