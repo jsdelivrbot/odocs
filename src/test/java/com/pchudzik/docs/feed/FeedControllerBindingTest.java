@@ -5,6 +5,7 @@ import com.pchudzik.docs.feed.download.DownloadEventListener;
 import com.pchudzik.docs.feed.download.DownloadInfo;
 import com.pchudzik.docs.feed.download.DownloadInfoRepository;
 import com.pchudzik.docs.feed.download.DownloadInfoService;
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
 import com.pchudzik.docs.feed.model.FeedCategory;
 import com.pchudzik.docs.feed.model.FeedInfo;
 import com.pchudzik.docs.utils.FakeTimeProvider;
@@ -57,17 +58,16 @@ public class FeedControllerBindingTest {
 	@SneakyThrows
 	public void should_initialize_download_and_return_downloadId() {
 		final String submitDate = "2015-04-16T18:01:00.000Z";
+		final DownloadEventFactory downloadEventFactory = new DownloadEventFactory(new FakeTimeProvider(submitDate));
 		final DownloadInfo downloadInfo = DownloadInfo.builder()
 				.id("id")
-				.timeProvider(new FakeTimeProvider(submitDate))
 				.downloadEventListener(mock(DownloadEventListener.class))
-				.feedFile(feedFile)
-				.feedName(feedName)
-				.documentationId(docId)
 				.build();
 		when(downloadInfoService.startDownload(docId, feedName, feedFile))
 				.thenReturn(downloadInfo);
-		downloadInfo.requestAbort();
+
+		downloadInfo.submit(downloadEventFactory.downloadSubmitEvent(docId, feedName, feedFile));
+		downloadInfo.requestAbort(downloadEventFactory.abortEvent());
 
 		//when
 		controllerTester.perform(httpPost("/feeds/downloads", downloadRequestPayload))
@@ -89,7 +89,10 @@ public class FeedControllerBindingTest {
 						"  progressEvent: null," +
 						"  finishEvent: null," +
 						"  errorEvent: null," +
-						"  abortEvent: null," +
+						"  abortEvent: {" +
+						"    eventType: 'ABORT'," +
+						"    abortDate: '" + submitDate + "'" +
+						"  }," +
 						"  removeEvent: null" +
 						"}")));
 	}

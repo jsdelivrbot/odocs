@@ -1,13 +1,15 @@
 package com.pchudzik.docs.feed.download;
 
 import com.pchudzik.docs.feed.OnlineFeedRepository;
+import com.pchudzik.docs.feed.download.event.DownloadErrorEvent;
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
+import com.pchudzik.docs.feed.download.event.DownloadFinishEvent;
+import com.pchudzik.docs.feed.download.event.DownloadStartEvent;
 import com.pchudzik.docs.feed.model.Feed;
 import com.pchudzik.docs.infrastructure.HttpClientsConfiguration;
 import com.pchudzik.docs.manage.ManagementService;
 import com.pchudzik.docs.manage.dto.VersionDto;
 import com.pchudzik.docs.model.DocumentationVersion;
-import com.pchudzik.docs.utils.FakeTimeProvider;
-import com.pchudzik.docs.utils.TimeProvider;
 import com.pchudzik.docs.utils.http.MultipartFileFactory;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
@@ -42,7 +44,7 @@ public class DownloadJobTest {
 	private final byte [] SMALL_FILE = RandomUtils.nextBytes(1);
 	private final DateTime NOW = DateTime.now();
 
-	TimeProvider timeProvider = new FakeTimeProvider(NOW);
+	@Mock DownloadEventFactory downloadEventFactory;
 	@Mock OnlineFeedRepository feedRepository;
 	@Mock ManagementService managementService;
 	@Mock DownloadInfo downloadInfo;
@@ -77,6 +79,7 @@ public class DownloadJobTest {
 				managementService,
 				feedRepository,
 				multipartFileFactory,
+				downloadEventFactory,
 				tmpDirectory);
 	}
 
@@ -88,12 +91,14 @@ public class DownloadJobTest {
 
 	@Test
 	public void should_broadcast_on_start_event() {
+		final DownloadStartEvent downloadStartEvent = mock(DownloadStartEvent.class);
 		final DownloadJob job = setupSimpleFileDownload(SC_OK, FEED_FILE, SMALL_FILE);
+		when(downloadEventFactory.startEvent()).thenReturn(downloadStartEvent);
 
 		//when
 		job.run();
 
-		verify(downloadInfo).start();
+		verify(downloadInfo).start(downloadStartEvent);
 	}
 
 	@Test
@@ -104,35 +109,39 @@ public class DownloadJobTest {
 		job.run();
 
 		//then
-		verify(downloadInfo, atLeastOnce()).progress(anyInt(), anyInt());
+		verify(downloadInfo, atLeastOnce()).progress(downloadEventFactory.progressEvent(anyInt(), anyInt()));
 	}
 
 	@Test
 	public void should_broadcast_on_finish_event() {
 		final String versionId = "id";
+		final DownloadFinishEvent finishEvent = mock(DownloadFinishEvent.class);
 		final DownloadJob downloadJob = setupSimpleFileDownload(SC_OK, FEED_FILE, SMALL_FILE);
 		when(managementService.updateVersion(anyString(), any(Feed.class), any(MultipartFile.class)))
 				.thenReturn(new VersionDto(DocumentationVersion.builder()
 						.id(versionId)
 						.name("name")
 						.build()));
+		when(downloadEventFactory.finishEvent(versionId)).thenReturn(finishEvent);
 
 		//when
 		downloadJob.run();
 
 		//then
-		verify(downloadInfo).finish(versionId);
+		verify(downloadInfo).finish(finishEvent);
 	}
 
 	@Test
 	public void should_broadcast_on_error_event() {
+		final DownloadErrorEvent downloadErrorEvent = mock(DownloadErrorEvent.class);
 		final DownloadJob downloadJob = setupSimpleFileDownload(SC_NOT_FOUND, FEED_FILE, SMALL_FILE);
+		when(downloadEventFactory.errorEvent(any(Exception.class))).thenReturn(downloadErrorEvent);
 
 		//when
 		downloadJob.run();
 
 		//then
-		verify(downloadInfo).finish(any(Exception.class));
+		verify(downloadInfo).finish(downloadErrorEvent);
 	}
 
 	@Test

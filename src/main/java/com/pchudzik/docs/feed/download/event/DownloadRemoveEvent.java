@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 public class DownloadRemoveEvent extends DownloadEvent {
 	private final DateTime removalDate;
 
-	public DownloadRemoveEvent(DateTime removalDate) {
+	DownloadRemoveEvent(DateTime removalDate) {
 		super(EventType.REMOVE);
 		this.removalDate = removalDate;
 	}

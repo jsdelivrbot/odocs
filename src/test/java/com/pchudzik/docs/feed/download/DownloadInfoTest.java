@@ -1,5 +1,6 @@
 package com.pchudzik.docs.feed.download;
 
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
 import com.pchudzik.docs.utils.FakeTimeProvider;
 import org.assertj.core.data.Offset;
 import org.joda.time.DateTime;
@@ -18,65 +19,65 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class DownloadInfoTest {
 	public static final String ANY_ID = "any id";
 	@Mock DownloadEventListener downloadEventListener;
+	DownloadEventFactory downloadEventFactory = new DownloadEventFactory(new FakeTimeProvider(new DateTime(2015, 5, 19, 17, 57)));
 	private DownloadInfo downloadInfo;
 
 	@BeforeMethod void setup() {
 		initMocks(this);
 		downloadInfo = DownloadInfo.builder()
-				.timeProvider(new FakeTimeProvider(DateTime.now()))
 				.downloadEventListener(downloadEventListener)
 				.build();
 	}
 
 	@Test(expectedExceptions = IllegalStateException.class)
 	public void should_throw_exception_when_abort_of_finished_job() {
-		downloadInfo.start();
-		downloadInfo.finish(ANY_ID);
+		downloadInfo.start(downloadEventFactory.startEvent());
+		downloadInfo.finish(downloadEventFactory.finishEvent(ANY_ID));
 
 		//when
-		downloadInfo.requestAbort();
+		downloadInfo.requestAbort(downloadEventFactory.abortEvent());
 
 		//then exception
 	}
 
 	@Test(expectedExceptions = IllegalStateException.class)
 	public void should_throw_exception_when_removal_of_not_finished_job() {
-		downloadInfo.start();
+		downloadInfo.start(downloadEventFactory.startEvent());
 
 		//when
-		downloadInfo.requestRemove();
+		downloadInfo.requestRemove(downloadEventFactory.removeEvent());
 
 		//then exception
 	}
 
 	@Test
 	public void should_remove_finished_job() {
-		downloadInfo.start();
-		downloadInfo.finish(ANY_ID);
+		downloadInfo.start(downloadEventFactory.startEvent());
+		downloadInfo.finish(downloadEventFactory.finishEvent(ANY_ID));
 
 		//when
-		downloadInfo.requestRemove();
+		downloadInfo.requestRemove(downloadEventFactory.removeEvent());
 
 		//then no exception
 	}
 
 	@Test
 	public void should_remove_aborted_job() {
-		downloadInfo.start();
-		downloadInfo.requestAbort();
-		downloadInfo.progress(10, 1);
+		downloadInfo.start(downloadEventFactory.startEvent());
+		downloadInfo.requestAbort(downloadEventFactory.abortEvent());
+		downloadInfo.progress(downloadEventFactory.progressEvent(10, 1));
 
 		//when
-		downloadInfo.requestRemove();
+		downloadInfo.requestRemove(downloadEventFactory.removeEvent());
 
 		//then no exception
 	}
 
 	@Test
 	public void should_initialize_progress_if_not_initialized_yet() {
-		downloadInfo.start();
+		downloadInfo.start(downloadEventFactory.startEvent());
 
-		downloadInfo.progress(100, 1);
+		downloadInfo.progress(downloadEventFactory.progressEvent(100, 1));
 
 		assertThat(downloadInfo.getProgressEvent()).isNotNull();
 	}
@@ -92,24 +93,24 @@ public class DownloadInfoTest {
 
 		final double initialProgress = initialBytes / (double)totalBytes;
 		final double finalProgress = finalDownloadBytes / (double)totalBytes;
-		downloadInfo.start();
+		downloadInfo.start(downloadEventFactory.startEvent());
 
 		//when
-		downloadInfo.progress(totalBytes, initialBytes);
+		downloadInfo.progress(downloadEventFactory.progressEvent(totalBytes, initialBytes));
 
 		//then
 		assertThat(downloadInfo.getProgressEvent().getProgress())
 				.isEqualTo(initialProgress, doubleCheckThreshold);
 
 		//when
-		downloadInfo.progress(totalBytes, (int) (initialBytes + thresholdTrigger / 4.0));
+		downloadInfo.progress(downloadEventFactory.progressEvent(totalBytes, (int) (initialBytes + thresholdTrigger / 4.0)));
 
 		//then
 		assertThat(downloadInfo.getProgressEvent().getProgress())
 				.isEqualTo(initialProgress, doubleCheckThreshold);
 
 		//when
-		downloadInfo.progress(totalBytes, finalDownloadBytes);
+		downloadInfo.progress(downloadEventFactory.progressEvent(totalBytes, finalDownloadBytes));
 
 		//then
 		assertThat(downloadInfo.getProgressEvent().getProgress())

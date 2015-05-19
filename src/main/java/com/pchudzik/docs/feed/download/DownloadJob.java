@@ -3,6 +3,7 @@ package com.pchudzik.docs.feed.download;
 import com.google.common.base.Stopwatch;
 import com.pchudzik.docs.feed.OnlineFeedRepository;
 import com.pchudzik.docs.feed.download.copy.CopyExecutor;
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
 import com.pchudzik.docs.feed.model.Feed;
 import com.pchudzik.docs.manage.ManagementService;
 import com.pchudzik.docs.manage.dto.VersionDto;
@@ -21,7 +22,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.function.Supplier;
 
 /**
  * Created by pawel on 28.03.15.
@@ -35,11 +35,12 @@ class DownloadJob implements Runnable {
 	final ManagementService managementService;
 	final OnlineFeedRepository feedRepository;
 	final MultipartFileFactory multipartFileFactory;
+	final DownloadEventFactory downloadEventFactory;
 	final File tmpDir;
 
 	@Override
 	public void run() {
-		downloadInfo.start();
+		downloadInfo.start(downloadEventFactory.startEvent());
 
 		final Feed feed = feedRepository.getFeed(downloadInfo.getFeedFile());
 
@@ -48,23 +49,19 @@ class DownloadJob implements Runnable {
 			savedFile = downloadFile(httpResponse);
 
 			if(downloadInfo.isInterrupted()) {
-				downloadInfo.finish();
+				downloadInfo.finish(downloadEventFactory.finishEventWithoutResult());
 			} else {
 				final VersionDto versionDto = managementService.updateVersion(
 						downloadInfo.getDocumentationId(),
 						feed,
 						multipartFileFactory.fromFile(savedFile));
-				downloadInfo.finish(versionDto.getId());
+				downloadInfo.finish(downloadEventFactory.finishEvent(versionDto.getId()));
 			}
 		} catch (Exception ex) {
-			downloadInfo.finish(ex);
+			downloadInfo.finish(downloadEventFactory.errorEvent(ex));
 		} finally {
 			FileUtils.deleteQuietly(savedFile);
 		}
-	}
-
-	private Supplier<IllegalStateException> startingNotSubmittedJobException() {
-		return () -> new IllegalStateException("Starting not submitted job");
 	}
 
 	@SneakyThrows
@@ -80,7 +77,7 @@ class DownloadJob implements Runnable {
 		try (final FileOutputStream fos = new FileOutputStream(dstFile)) {
 			CopyExecutor.builder()
 					.abortNotifier(downloadInfo::isInterrupted)
-					.progressListener(bytes -> downloadInfo.progress((int)totalBytes, bytes))
+					.progressListener(bytes -> downloadInfo.progress(downloadEventFactory.progressEvent((int)totalBytes, bytes)))
 					.source(new BufferedInputStream(httpEntity.getContent()))
 					.destination(fos)
 					.build()

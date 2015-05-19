@@ -1,6 +1,7 @@
 package com.pchudzik.docs.feed.download;
 
 import com.pchudzik.docs.feed.OnlineFeedRepository;
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
 import com.pchudzik.docs.infrastructure.annotation.TemporaryDirectory;
 import com.pchudzik.docs.manage.ManagementService;
 import com.pchudzik.docs.utils.http.MultipartFileFactory;
@@ -19,6 +20,7 @@ class DownloadJobFactory {
 	final ManagementService managementService;
 	final OnlineFeedRepository feedRepository;
 	final MultipartFileFactory multipartFileFactory;
+	final DownloadEventFactory downloadEventFactory;
 	final File tmpDir;
 
 	@Autowired
@@ -27,17 +29,20 @@ class DownloadJobFactory {
 			ManagementService managementService,
 			OnlineFeedRepository feedRepository,
 			MultipartFileFactory multipartFileFactory,
+			DownloadEventFactory downloadEventFactory,
 			@TemporaryDirectory File tmpDir) {
 		this.httpClient = httpClient;
 		this.managementService = managementService;
 		this.feedRepository = feedRepository;
 		this.multipartFileFactory = multipartFileFactory;
+		this.downloadEventFactory = downloadEventFactory;
 		this.tmpDir = tmpDir;
 	}
 
 	public DownloadJob create(DownloadInfo downloadInfo) {
 		return DownloadJob.builder()
 				.downloadInfo(downloadInfo)
+				.downloadEventFactory(downloadEventFactory)
 				.feedRepository(feedRepository)
 				.httpClient(httpClient)
 				.managementService(managementService)

@@ -12,7 +12,7 @@ public class DownloadProgressEvent extends DownloadEvent {
 	private final int totalBytes;
 	private final int downloadedBytes;
 
-	public DownloadProgressEvent(DateTime progressDate, int totalBytes, int downloadedBytes) {
+	DownloadProgressEvent(DateTime progressDate, int totalBytes, int downloadedBytes) {
 		super(EventType.PROGRESS);
 
 		this.progressDate = progressDate;

@@ -13,7 +13,7 @@ public class DownloadSubmitEvent extends DownloadEvent {
 	private final String feedName;
 	private final String feedFile;
 
-	public DownloadSubmitEvent(DateTime submitDate, String documentationId, String feedName, String feedFile) {
+	DownloadSubmitEvent(DateTime submitDate, String documentationId, String feedName, String feedFile) {
 		super(EventType.SUBMIT);
 		this.submitDate = submitDate;
 		this.documentationId = documentationId;

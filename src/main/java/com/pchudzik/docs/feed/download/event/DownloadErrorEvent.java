@@ -14,7 +14,7 @@ public class DownloadErrorEvent extends DownloadEvent {
 	private final String errorMessage;
 	private final String stackTrace;
 
-	public DownloadErrorEvent(DateTime errorDate, Exception ex) {
+	DownloadErrorEvent(DateTime errorDate, Exception ex) {
 		super(EventType.ERROR);
 
 		this.errorDate = errorDate;

@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 public class DownloadStartEvent extends DownloadEvent {
 	private final DateTime startDate;
 
-	public DownloadStartEvent(DateTime startDate) {
+	DownloadStartEvent(DateTime startDate) {
 		super(EventType.START);
 		this.startDate = startDate;
 	}

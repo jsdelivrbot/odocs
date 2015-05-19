@@ -1,6 +1,7 @@
 package com.pchudzik.docs.feed.download;
 
-import com.pchudzik.docs.utils.TimeProvider;
+import com.pchudzik.docs.feed.download.event.DownloadEventFactory;
+import com.pchudzik.docs.utils.FakeTimeProvider;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -9,8 +10,6 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
@@ -43,14 +42,13 @@ public class DownloadInfoRepositoryTest {
 	}
 
 	private DownloadInfo downloadInfo(String id,DateTime submitDate) {
-		final TimeProvider timeProvider = mock(TimeProvider.class);
-		when(timeProvider.now()).thenReturn(submitDate);
-
-		return DownloadInfo.builder()
+		final DownloadEventFactory downloadEventFactory = new DownloadEventFactory(new FakeTimeProvider(submitDate));
+		final DownloadInfo downloadInfo = DownloadInfo.builder()
 				.id(id)
-				.timeProvider(timeProvider)
 				.downloadEventListener(downloadInfoRepository)
 				.build();
+		downloadInfo.submit(downloadEventFactory.downloadSubmitEvent("", "", ""));
+		return downloadInfo;
 	}
 
 }

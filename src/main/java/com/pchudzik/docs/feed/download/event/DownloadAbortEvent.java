@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 public class DownloadAbortEvent extends DownloadEvent {
 	private final DateTime abortDate;
 
-	public DownloadAbortEvent(DateTime abortDate) {
+	DownloadAbortEvent(DateTime abortDate) {
 		super(EventType.ABORT);
 		this.abortDate = abortDate;
 	}
