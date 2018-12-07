@@ -1,7 +1,7 @@
 {
 	"updateDate": "2015-03-15T18:16:00.000Z",
 	"name": "Dynamic html5 mode",
-	"url": "https://rawgit.com/pchudzik/odocs/master/feed/test/dynamic.zip",
+	"url": "https://cdn.jsdelivr.net/gh/pchudzik/odocs/feed/test/dynamic.zip",
 	"initialDirectory": "api",
 	"rootDirectory": "dynamic",
 	"rewriteRules": [
